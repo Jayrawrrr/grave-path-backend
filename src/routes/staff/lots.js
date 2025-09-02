@@ -19,22 +19,17 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    console.log('Received create lot request with data:', req.body);
-    
     // Validate required fields
     if (!req.body.id) {
-      console.log('Missing required field: id');
       return res.status(400).json({ msg: 'Lot ID is required' });
     }
     
     if (!req.body.bounds || !Array.isArray(req.body.bounds) || req.body.bounds.length !== 2) {
-      console.log('Invalid bounds format:', req.body.bounds);
       return res.status(400).json({ msg: 'Invalid bounds format' });
     }
 
     // Create the lot
     const lot = await Lot.create(req.body);
-    console.log('Successfully created lot:', lot);
     res.status(201).json(lot);
   } catch (err) {
     console.error('Error creating lot:', {

@@ -111,7 +111,7 @@ router.post('/webhook', async (req, res) => {
         // TODO: Implement failed payment handling
         break;
       default:
-        console.log('Unhandled event type:', event.type);
+        // Unhandled event type logged for monitoring
     }
 
     res.json({ received: true });

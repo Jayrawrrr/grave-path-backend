@@ -621,9 +621,9 @@ router.post('/upload-proof', upload.single('proofImage'), async (req, res) => {
     let emailError = null;
     
     try {
-      // Check if email credentials are configured
-      if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-        emailError = 'Email not configured - SMTP credentials missing';
+      // Check if email is configured
+      if (!process.env.EMAIL_FROM) {
+        emailError = 'Email not configured - EMAIL_FROM missing';
         throw new Error(emailError);
       }
       
@@ -701,7 +701,7 @@ router.post('/upload-proof', upload.single('proofImage'), async (req, res) => {
       `;
 
       const encodedMessage = Buffer.from(
-        `To: ${emailToUse}\r\nFrom: "Garden of Memories Memorial Park" <${process.env.SMTP_USER}>\r\nSubject: ✅ Payment Proof Received - Garden of Memories Memorial Park\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n${emailContent}`
+        `To: ${emailToUse}\r\nFrom: "Garden of Memories Memorial Park" <${process.env.EMAIL_FROM}>\r\nSubject: ✅ Payment Proof Received - Garden of Memories Memorial Park\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n${emailContent}`
       ).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
       await gmail.users.messages.send({ userId: 'me', requestBody: { raw: encodedMessage } });
@@ -841,11 +841,11 @@ router.post('/test-email', async (req, res) => {
       });
     }
 
-    // Check if email credentials are configured
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    // Check if email is configured
+    if (!process.env.EMAIL_FROM) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Email not configured - SMTP credentials missing in environment variables' 
+        error: 'Email not configured - EMAIL_FROM missing in environment variables' 
       });
     }
 
@@ -863,9 +863,8 @@ router.post('/test-email', async (req, res) => {
             
             <div style="background: white; border: 2px solid #17a2b8; border-radius: 8px; padding: 20px; margin: 20px 0;">
               <h3 style="color: #17a2b8; margin-top: 0;">📋 Configuration Details</h3>
-              <p><strong>SMTP Server:</strong> smtp.gmail.com</p>
-              <p><strong>Port:</strong> 587</p>
-              <p><strong>Sender:</strong> ${process.env.SMTP_USER}</p>
+              <p><strong>Email Service:</strong> Gmail API</p>
+              <p><strong>Sender:</strong> ${process.env.EMAIL_FROM}</p>
               <p><strong>Test Time:</strong> ${new Date().toLocaleString()}</p>
             </div>
 
@@ -875,7 +874,7 @@ router.post('/test-email', async (req, res) => {
     `;
 
     const encodedMessage = Buffer.from(
-      `To: ${testEmail}\r\nFrom: "Garden of Memories Memorial Park" <${process.env.SMTP_USER}>\r\nSubject: 📧 Email Test - Garden of Memories Memorial Park\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n${emailContent}`
+      `To: ${testEmail}\r\nFrom: "Garden of Memories Memorial Park" <${process.env.EMAIL_FROM}>\r\nSubject: 📧 Email Test - Garden of Memories Memorial Park\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n${emailContent}`
     ).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
     await gmail.users.messages.send({ userId: 'me', requestBody: { raw: encodedMessage } });
@@ -883,7 +882,7 @@ router.post('/test-email', async (req, res) => {
     res.json({ 
       success: true, 
       message: `Test email sent successfully to ${testEmail}`,
-      smtpUser: process.env.SMTP_USER
+      emailFrom: process.env.EMAIL_FROM
     });
 
   } catch (error) {

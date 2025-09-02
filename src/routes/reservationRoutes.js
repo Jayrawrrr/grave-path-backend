@@ -78,14 +78,9 @@ const sendReservationEmail = async (to, subject, htmlContent) => {
     return false;
   }
 };
-console.log('sendReservationEmail type:', typeof sendReservationEmail);
-
 // Create reservation with file upload - allow both client and staff roles
 router.post('/create', protect(['client', 'staff']), upload.single('proofImage'), async (req, res) => {
   try {
-    console.log('Received reservation request:', req.body);
-    console.log('File:', req.file);
-    console.log('User from token:', req.user);
 
     const {
       lotId,
@@ -143,7 +138,6 @@ router.post('/create', protect(['client', 'staff']), upload.single('proofImage')
 
     const reservation = new Reservation(reservationData);
     await reservation.save();
-    console.log('Reservation saved:', reservation);
 
     // Send confirmation email for client reservations
     if (req.user.role === 'client' && shouldSendEmail !== 'false') {
