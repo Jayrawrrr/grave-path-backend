@@ -168,8 +168,18 @@ router.post('/send-verification', async (req, res) => {
       stack: err.stack
     });
     
+    // Log OAuth2 specific details
+    if (err.response) {
+      console.error('Gmail API Response Error:', {
+        status: err.response.status,
+        statusText: err.response.statusText,
+        data: err.response.data
+      });
+    }
+    
     // More specific error handling
     if (err.message && err.message.includes('invalid_grant')) {
+      console.error('OAuth2 Token Error - Token likely expired or invalid');
       return res.status(500).json({ message: 'Email authentication failed. Please check OAuth2 configuration.' });
     }
     
@@ -180,6 +190,17 @@ router.post('/send-verification', async (req, res) => {
     // Check for OAuth2Client setup errors
     if (err.message && (err.message.includes('OAuth2Client') || err.message.includes('client_id'))) {
       return res.status(500).json({ message: 'OAuth2 configuration error. Please check email settings.' });
+    }
+    
+    // Check for Gmail API specific errors
+    if (err.message && err.message.includes('quota')) {
+      console.error('Gmail API Quota Exceeded');
+      return res.status(500).json({ message: 'Email service quota exceeded. Please try again later.' });
+    }
+    
+    if (err.message && err.message.includes('unauthorized')) {
+      console.error('Gmail API Unauthorized - Check OAuth2 setup');
+      return res.status(500).json({ message: 'Email authentication failed. Please check OAuth2 configuration.' });
     }
     
     res.status(500).json({ message: 'Failed to send verification code. Please try again.' });
