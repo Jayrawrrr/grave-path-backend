@@ -32,6 +32,8 @@ import chatbotRouter from './routes/chatbot.js';
 import publicLots from './routes/public/lots.js';
 import publicAnnouncements from './routes/public/announcements.js';
 import publicInfo from './routes/public/info.js';
+import adminColumbarium from './routes/admin/columbarium.js';
+import clientColumbarium from './routes/client/columbarium.js';
 
 dotenv.config();
 const app = express();
@@ -86,12 +88,20 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Create uploads directories if they don't exist
 const uploadsDir = path.join(__dirname, '../uploads');
 const proofsDir = path.join(__dirname, '../uploads/proofs');
+const columbariumDir = path.join(__dirname, '../uploads/columbarium');
+const columbariumDocsDir = path.join(__dirname, '../uploads/columbarium/documents');
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 if (!fs.existsSync(proofsDir)) {
   fs.mkdirSync(proofsDir, { recursive: true });
+}
+if (!fs.existsSync(columbariumDir)) {
+  fs.mkdirSync(columbariumDir, { recursive: true });
+}
+if (!fs.existsSync(columbariumDocsDir)) {
+  fs.mkdirSync(columbariumDocsDir, { recursive: true });
 }
 
 // Health-check
@@ -112,6 +122,7 @@ app.use('/api/staff/announcements', staffAnnouncements);
 app.use('/api/client/lots', clientLots);
 app.use('/api/client/reservations', clientReservations);
 app.use('/api/client/announcements', clientAnnouncements);
+app.use('/api/client/columbarium', clientColumbarium);
 
 // Admin routes
 app.use('/api/admin/users', adminUsers);
@@ -120,6 +131,7 @@ app.use('/api/admin/burials', burialsRouter);
 app.use('/api/admin/interments', intermentsRouter);
 app.use('/api/admin/reports/financial', financialRouter);
 app.use('/api/admin/statistics', statisticsRouter);
+app.use('/api/admin/columbarium', adminColumbarium);
 
 // Payment
 app.use('/api/payment', paymentRouter);
