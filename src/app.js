@@ -32,6 +32,8 @@ import chatbotRouter from './routes/chatbot.js';
 import publicLots from './routes/public/lots.js';
 import publicAnnouncements from './routes/public/announcements.js';
 import publicInfo from './routes/public/info.js';
+import adminColumbarium from './routes/admin/columbarium.js';
+import clientColumbarium from './routes/client/columbarium.js';
 
 dotenv.config();
 const app = express();
@@ -112,6 +114,7 @@ app.use('/api/staff/announcements', staffAnnouncements);
 app.use('/api/client/lots', clientLots);
 app.use('/api/client/reservations', clientReservations);
 app.use('/api/client/announcements', clientAnnouncements);
+app.use('/api/client/columbarium', clientColumbarium);
 
 // Admin routes
 app.use('/api/admin/users', adminUsers);
@@ -120,6 +123,7 @@ app.use('/api/admin/burials', burialsRouter);
 app.use('/api/admin/interments', intermentsRouter);
 app.use('/api/admin/reports/financial', financialRouter);
 app.use('/api/admin/statistics', statisticsRouter);
+app.use('/api/admin/columbarium', adminColumbarium);
 
 // Payment
 app.use('/api/payment', paymentRouter);
