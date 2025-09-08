@@ -111,6 +111,129 @@ router.post('/slots', protect(['admin']), async (req, res) => {
   }
 });
 
+// PUT /api/admin/columbarium/slots/:id - Update slot
+router.put('/slots/:id', protect(['admin']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    // Generate new slot ID if location changed
+    if (updateData.building || updateData.floor || updateData.section || updateData.row || updateData.column) {
+      const slotId = `${updateData.building.substring(0, 1)}${updateData.floor}${updateData.section}${String(updateData.row).padStart(2, '0')}${String(updateData.column).padStart(2, '0')}`;
+      updateData.slotId = slotId;
+    }
+    
+    const slot = await ColumbariumSlot.findByIdAndUpdate(id, updateData, { new: true });
+    
+    if (!slot) {
+      return res.status(404).json({ message: 'Slot not found' });
+    }
+    
+    res.json(slot);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Slot already exists at this position' });
+    }
+    console.error('Error updating columbarium slot:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// DELETE /api/admin/columbarium/slots/:id - Delete slot
+router.delete('/slots/:id', protect(['admin']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if slot has active reservations
+    const reservation = await ColumbariumReservation.findOne({ slotId: id });
+    if (reservation) {
+      return res.status(400).json({ message: 'Cannot delete slot with active reservations' });
+    }
+    
+    const slot = await ColumbariumSlot.findByIdAndDelete(id);
+    
+    if (!slot) {
+      return res.status(404).json({ message: 'Slot not found' });
+    }
+    
+    res.json({ message: 'Slot deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting columbarium slot:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// POST /api/admin/columbarium/bulk-create - Bulk create slots
+router.post('/bulk-create', protect(['admin']), async (req, res) => {
+  try {
+    const { slots } = req.body;
+    
+    if (!slots || !Array.isArray(slots) || slots.length === 0) {
+      return res.status(400).json({ message: 'Slots array is required' });
+    }
+    
+    // Validate all slots
+    for (const slot of slots) {
+      if (!slot.slotId || !slot.building || !slot.floor || !slot.section || !slot.row || !slot.column) {
+        return res.status(400).json({ message: 'All slots must have required fields' });
+      }
+    }
+    
+    const createdSlots = await ColumbariumSlot.insertMany(slots);
+    
+    res.status(201).json({
+      message: `${createdSlots.length} slots created successfully`,
+      slots: createdSlots
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Some slots already exist' });
+    }
+    console.error('Error bulk creating columbarium slots:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// GET /api/admin/columbarium/reservations - Get all reservations
+router.get('/reservations', protect(['admin', 'staff']), async (req, res) => {
+  try {
+    const { 
+      status, 
+      page = 1, 
+      limit = 20 
+    } = req.query;
+
+    const filter = {};
+    if (status) filter.status = status;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const reservations = await ColumbariumReservation.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('clientId', 'firstName lastName email')
+      .populate('staffId', 'firstName lastName')
+      .populate('approvedBy', 'firstName lastName');
+
+    const total = await ColumbariumReservation.countDocuments(filter);
+
+    res.json({
+      reservations,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / parseInt(limit)),
+        totalReservations: total,
+        hasNext: skip + reservations.length < total,
+        hasPrev: parseInt(page) > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching columbarium reservations:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // POST /api/admin/columbarium/reservations - Create reservation (admin/staff)
 router.post('/reservations', protect(['admin', 'staff']), upload.single('proofImage'), async (req, res) => {
   try {
@@ -173,6 +296,45 @@ router.post('/reservations', protect(['admin', 'staff']), upload.single('proofIm
     res.status(201).json(reservation);
   } catch (error) {
     console.error('Error creating columbarium reservation:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// PUT /api/admin/columbarium/reservations/:id/status - Update reservation status
+router.put('/reservations/:id/status', protect(['admin', 'staff']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, rejectionReason } = req.body;
+    
+    const reservation = await ColumbariumReservation.findById(id);
+    if (!reservation) {
+      return res.status(404).json({ message: 'Reservation not found' });
+    }
+    
+    reservation.status = status;
+    if (status === 'approved') {
+      reservation.approvedBy = req.user.id;
+      reservation.approvedAt = new Date();
+    } else if (status === 'rejected') {
+      reservation.rejectionReason = rejectionReason;
+    }
+    
+    await reservation.save();
+    
+    // Update slot status based on reservation status
+    const slot = await ColumbariumSlot.findOne({ slotId: reservation.slotId });
+    if (slot) {
+      if (status === 'approved') {
+        slot.status = 'reserved';
+      } else if (status === 'rejected' || status === 'cancelled') {
+        slot.status = 'available';
+      }
+      await slot.save();
+    }
+    
+    res.json(reservation);
+  } catch (error) {
+    console.error('Error updating reservation status:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
