@@ -7,6 +7,7 @@ import fs from 'fs';
 import Reservation from '../models/Reservation.js';
 import Lot from '../models/Lot.js';
 import ActivityLogs from '../models/ActivityLogs.js';
+import { ChatbotConfig } from '../models/ChatbotConfig.js';
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -79,8 +80,8 @@ async function getCemeteryData() {
 }
 
 // Enhanced system prompt with dynamic data
-function createEnhancedSystemPrompt(cemeteryData) {
-  return `You are a helpful AI assistant for Garden of Memories Memorial Park in Pateros, Philippines. You provide accurate information about our specific cemetery services and facilities.
+function createEnhancedSystemPrompt(cemeteryData, baseSystemPrompt) {
+  return `${baseSystemPrompt}
 
 GARDEN OF MEMORIES MEMORIAL PARK INFORMATION:
 
@@ -193,6 +194,28 @@ const oauth2Client = new OAuth2Client(
 oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
+// Get chatbot configuration (public access for quick questions)
+router.get('/config', async (req, res) => {
+  try {
+    const config = await ChatbotConfig.getActiveConfig();
+    const userType = req.query.userType || 'all';
+    
+    res.json({
+      success: true,
+      data: {
+        quickQuestions: config.getQuickQuestions(userType),
+        faqResponses: config.getFaqResponses(userType)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching chatbot config:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch chatbot configuration'
+    });
+  }
+});
+
 // Guest chatbot endpoint (public access, no authentication required)
 router.post('/guest-message', async (req, res) => {
   try {
@@ -209,23 +232,9 @@ router.post('/guest-message', async (req, res) => {
       return res.status(500).json({ error: 'AI service not configured' });
     }
 
-    // Create guest-specific system prompt
-    const guestSystemPrompt = `You are a helpful AI assistant for Garden of Memories Memorial Park. You are speaking to a GUEST USER who is not logged in.
-
-IMPORTANT LIMITATIONS FOR GUESTS:
-- Guests CANNOT make reservations - always redirect them to create an account and log in for reservations
-- You can help with: grave locating, plot availability info, pricing, visiting hours, facilities, general information
-- If they ask about reservations, politely explain they need to create an account first
-
-You can provide information about:
-- Cemetery visiting hours and policies
-- Plot pricing and availability information
-- Facilities and amenities
-- General park information
-- Directions and navigation
-- Grave location assistance (general guidance)
-
-Be warm, professional, and helpful while respecting these limitations. Always encourage them to create an account if they want to make reservations.`;
+    // Get dynamic guest system prompt from configuration
+    const config = await ChatbotConfig.getActiveConfig();
+    const guestSystemPrompt = config.guestSystemPrompt;
 
     // Prepare conversation for OpenAI
     const openaiMessages = conversationHistory.map(msg => {
@@ -296,11 +305,14 @@ router.post('/message', async (req, res) => {
       return res.status(500).json({ error: 'AI service not configured' });
     }
 
-    // Fetch real-time cemetery data
-    const cemeteryData = await getCemeteryData();
+    // Fetch real-time cemetery data and chatbot configuration
+    const [cemeteryData, config] = await Promise.all([
+      getCemeteryData(),
+      ChatbotConfig.getActiveConfig()
+    ]);
     
-    // Create enhanced system prompt with real-time data
-    const enhancedSystemPrompt = createEnhancedSystemPrompt(cemeteryData);
+    // Create enhanced system prompt with real-time data and dynamic configuration
+    const enhancedSystemPrompt = createEnhancedSystemPrompt(cemeteryData, config.systemPrompt);
     
     // Update conversation history with enhanced system prompt
     const enhancedConversationHistory = conversationHistory.map(msg => {
