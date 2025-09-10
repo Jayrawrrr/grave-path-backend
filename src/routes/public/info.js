@@ -20,29 +20,44 @@ Holidays: 10:00 AM – 2:00 PM`,
 • Photography requires permission`,
       amenities: [
         { 
-          imageUrl: '/amenity1.jpg',
-          title: 'Memorial Church',
-          description: 'A peaceful sanctuary for prayer and reflection'
+          imageUrl: '/Field1.jpg',
+          title: 'Memorial Field 1',
+          description: 'Peaceful burial grounds with well-maintained plots'
         },
         { 
-          imageUrl: '/amenity2.jpg',
-          title: 'Memorial Garden',
-          description: 'Beautifully landscaped gardens for quiet contemplation'
+          imageUrl: '/Field2.jpg',
+          title: 'Memorial Field 2',
+          description: 'Additional burial area with serene surroundings'
         },
         { 
-          imageUrl: '/amenity3.jpg',
-          title: 'Parking Area',
-          description: 'Spacious parking facility with 24/7 security'
+          imageUrl: '/BoardMonument.jpg',
+          title: 'Memorial Board & Monument',
+          description: 'Dedicated memorial space with commemorative monuments'
         },
         { 
-          imageUrl: '/amenity4.jpg',
+          imageUrl: '/Schedule&Announcement.jpg',
+          title: 'Schedule & Announcement Board',
+          description: 'Information center for park schedules and announcements'
+        },
+        { 
+          imageUrl: '/EntranceName.jpg',
+          title: 'Main Entrance',
+          description: 'Welcome entrance to Garden of Memories Memorial Park'
+        },
+        { 
+          imageUrl: '/Columbarium.jpg',
+          title: 'Columbarium',
+          description: 'Modern columbarium facility for cremated remains'
+        },
+        { 
+          imageUrl: '/MainBuilding.jpg',
+          title: 'Main Building',
+          description: 'Administrative building and visitor services center'
+        },
+        { 
+          imageUrl: '/Chapel.jpg',
           title: 'Memorial Chapel',
-          description: 'Intimate space for private ceremonies'
-        },
-        { 
-          imageUrl: '/amenity5.jpg',
-          title: 'Fountain Plaza',
-          description: 'Serene water feature with seating areas'
+          description: 'Sacred space for prayer, reflection, and ceremonies'
         }
       ]
     };
