@@ -20,6 +20,11 @@ Holidays: 10:00 AM – 2:00 PM`,
 • Photography requires permission`,
       amenities: [
         { 
+          imageUrl: '/EntranceName.jpg',
+          title: 'Main Entrance',
+          description: 'Welcome entrance to Garden of Memories Memorial Park'
+        },
+        { 
           imageUrl: '/Field1.jpg',
           title: 'Memorial Field 1',
           description: 'Peaceful burial grounds with well-maintained plots'
@@ -38,11 +43,6 @@ Holidays: 10:00 AM – 2:00 PM`,
           imageUrl: '/Schedule&Announcement.jpg',
           title: 'Schedule & Announcement Board',
           description: 'Information center for park schedules and announcements'
-        },
-        { 
-          imageUrl: '/EntranceName.jpg',
-          title: 'Main Entrance',
-          description: 'Welcome entrance to Garden of Memories Memorial Park'
         },
         { 
           imageUrl: '/Columbarium.jpg',
