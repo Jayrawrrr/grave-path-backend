@@ -116,11 +116,14 @@ ${code}
 
     // Check if email service is configured
     const requiredEnvVars = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_REFRESH_TOKEN', 'EMAIL_FROM'];
-    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+    const missingVars = requiredEnvVars.filter(varName => !process.env[varName] || process.env[varName].includes('your_'));
     
     if (missingVars.length > 0) {
-      console.error('Missing environment variables:', missingVars);
-      return res.status(500).json({ message: 'Email service not configured properly' });
+      console.error('Missing or placeholder environment variables:', missingVars);
+      return res.status(500).json({ 
+        message: 'Email service is not configured. Please contact support or try again later.',
+        error: 'EMAIL_SERVICE_NOT_CONFIGURED'
+      });
     }
 
     const encodedMessage = Buffer.from(
