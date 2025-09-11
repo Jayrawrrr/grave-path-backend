@@ -43,10 +43,6 @@ const app = express();
 const allowedOrigins = [
   'https://grave-path.com',
   'https://www.grave-path.com',
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:3001',
   process.env.FRONTEND_URL
 ].filter(Boolean); // Remove undefined values
 
