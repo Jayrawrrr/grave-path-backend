@@ -99,3 +99,4 @@ visitorInfoSchema.statics.getVisitorInfo = async function() {
 };
 
 export default mongoose.model('VisitorInfo', visitorInfoSchema);
+

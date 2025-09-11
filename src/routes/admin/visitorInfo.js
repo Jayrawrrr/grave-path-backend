@@ -165,3 +165,4 @@ router.delete('/amenities/:index', protect(['admin', 'staff']), async (req, res)
 });
 
 export default router;
+

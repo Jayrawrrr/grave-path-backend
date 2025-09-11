@@ -651,65 +651,106 @@ router.post('/upload-proof', upload.single('proofImage'), async (req, res) => {
       }
       
       const emailContent = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: #28a745; color: white; padding: 20px; text-align: center;">
-              <h1 style="margin: 0;">🏛️ Garden of Memories Memorial Park</h1>
-              <p style="margin: 5px 0 0 0;">✅ Payment Proof Received</p>
-            </div>
-            
-            <div style="padding: 30px; background: #f9f9f9;">
-              <h2 style="color: #28a745;">Payment Proof Successfully Submitted!</h2>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Proof Received - Garden of Memories</title>
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
               
-              <p>Dear <strong>${reservation.clientName}</strong>,</p>
-              
-              <p>Thank you! We have successfully received your payment proof for your cemetery plot reservation. Your reservation is now <strong style="color: #28a745;">COMPLETE</strong> and awaiting staff approval.</p>
-              
-              <div style="background: white; border: 2px solid #28a745; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                <h3 style="color: #28a745; margin-top: 0;">📋 Your Reservation Details</h3>
-                <p><strong>Reservation ID:</strong> ${reservation._id || 'N/A'}</p>
-                <p><strong>Plot Name:</strong> ${reservation.lotName || 'N/A'}</p>
-                <p><strong>Location:</strong> ${reservation.location || 'Garden of Memories Memorial Park'}</p>
-                <p><strong>Size:</strong> ${reservation.sqm || '12.5'} square meters</p>
-                <p><strong>Total Price:</strong> ₱${Number(reservation.totalPrice || 50000).toLocaleString()}</p>
-                <p><strong>Reservation Fee Paid:</strong> ₱${Number(reservation.paymentAmount || 5000).toLocaleString()}</p>
-                <p><strong>Payment Method:</strong> ${reservation.paymentMethod || 'N/A'}</p>
-                <p><strong>Contact:</strong> ${emailToUse}</p>
-                <p><strong>Status:</strong> <span style="color: #28a745; font-weight: bold;">✅ PAYMENT PROOF SUBMITTED</span></p>
-                <p><strong>Proof Uploaded:</strong> ${new Date().toLocaleDateString()}</p>
+              <!-- Header -->
+              <div style="background-color: #ffffff; padding: 40px 40px 20px 40px; text-align: center; border-bottom: 1px solid #e9ecef;">
+                <h1 style="color: #212529; margin: 0 0 8px 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Garden of Memories</h1>
+                <p style="color: #6c757d; margin: 0; font-size: 14px; font-weight: 400;">Memorial Park</p>
               </div>
 
-              <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0;">
-                <h4 style="color: #155724; margin-top: 0;">🎉 What Happens Next:</h4>
-                <ol style="color: #155724; line-height: 1.8;">
-                  <li><strong>✅ Payment Proof Received:</strong> Your payment proof has been successfully uploaded and attached to your reservation</li>
-                  <li><strong>⏳ Staff Review:</strong> Our staff will verify your payment within 24 hours during business hours</li>
-                  <li><strong>📞 Confirmation Call:</strong> You'll receive a confirmation call once approved</li>
-                  <li><strong>📧 Final Documentation:</strong> Complete reservation documents will be emailed to you</li>
-                  <li><strong>💰 Final Payment:</strong> Complete remaining balance within 30 days after approval</li>
-                </ol>
+              <!-- Status indicator -->
+              <div style="background-color: #d4edda; padding: 16px 40px; text-align: center; border-bottom: 1px solid #c3e6cb;">
+                <span style="color: #155724; font-weight: 600; font-size: 14px;">PAYMENT PROOF RECEIVED</span>
               </div>
 
-              <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
-                <h4 style="color: #856404; margin-top: 0;">📞 Contact Information</h4>
-                <p style="color: #856404;">If you have any questions about your reservation, please contact us:</p>
-                <ul style="color: #856404;">
-                  <li>📧 Email: reservations@gardenofmemories.ph</li>
-                  <li>🏢 Office: Garden of Memories Memorial Park, Pateros</li>
-                  <li>⏰ Hours: Mon-Fri 9AM-5PM, Weekends 10AM-4PM</li>
-                  <li>📝 Reference: Reservation ID ${reservation._id || 'N/A'}</li>
-                </ul>
+              <!-- Main content -->
+              <div style="padding: 40px 40px 20px 40px;">
+                <h2 style="color: #212529; margin: 0 0 16px 0; font-size: 20px; font-weight: 600;">Payment proof submitted</h2>
+                <p style="color: #6c757d; font-size: 16px; margin: 0 0 32px 0;">Dear <strong>${reservation.clientName}</strong>, thank you for submitting your payment proof. Your reservation is now complete and awaiting staff approval.</p>
+
+                <!-- Reservation details -->
+                <div style="background-color: #f8f9fa; border-radius: 8px; padding: 24px; margin: 32px 0; border-left: 3px solid #495057;">
+                  <h3 style="color: #212529; margin: 0 0 20px 0; font-size: 16px; font-weight: 600;">Reservation Details</h3>
+                  
+                  <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                      <span style="color: #495057; font-size: 14px; font-weight: 500;">Reservation ID</span>
+                      <span style="color: #212529; font-size: 14px; font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;">${reservation._id || 'N/A'}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                      <span style="color: #495057; font-size: 14px; font-weight: 500;">Plot Name</span>
+                      <span style="color: #212529; font-size: 14px;">${reservation.lotName || 'N/A'}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                      <span style="color: #495057; font-size: 14px; font-weight: 500;">Location</span>
+                      <span style="color: #212529; font-size: 14px;">${reservation.location || 'Garden of Memories Memorial Park'}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                      <span style="color: #495057; font-size: 14px; font-weight: 500;">Size</span>
+                      <span style="color: #212529; font-size: 14px;">${reservation.sqm || '12.5'} square meters</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                      <span style="color: #495057; font-size: 14px; font-weight: 500;">Total Price</span>
+                      <span style="color: #212529; font-size: 14px;">₱${Number(reservation.totalPrice || 50000).toLocaleString()}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                      <span style="color: #495057; font-size: 14px; font-weight: 500;">Amount Paid</span>
+                      <span style="color: #212529; font-size: 14px;">₱${Number(reservation.paymentAmount || 5000).toLocaleString()}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+                      <span style="color: #495057; font-size: 14px; font-weight: 500;">Payment Method</span>
+                      <span style="color: #212529; font-size: 14px;">${reservation.paymentMethod || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Next steps -->
+                <div style="background-color: #f8f9fa; border-radius: 8px; padding: 24px; margin: 32px 0; border-left: 3px solid #495057;">
+                  <h3 style="color: #212529; margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">What happens next</h3>
+                  <ol style="color: #495057; margin: 0; padding-left: 20px; font-size: 14px;">
+                    <li style="margin-bottom: 6px;">Our staff will verify your payment within 24 hours during business hours</li>
+                    <li style="margin-bottom: 6px;">You'll receive a confirmation call once approved</li>
+                    <li style="margin-bottom: 6px;">Complete reservation documents will be emailed to you</li>
+                    <li>Complete remaining balance within 30 days after approval</li>
+                  </ol>
+                </div>
+
+                <!-- Contact information -->
+                <div style="background-color: #f8f9fa; border-radius: 8px; padding: 24px; margin: 32px 0;">
+                  <h3 style="color: #212529; margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Questions or assistance?</h3>
+                  <p style="color: #6c757d; margin: 0 0 12px 0; font-size: 14px;">If you have any questions about your reservation, please contact us:</p>
+                  <div style="margin-top: 16px;">
+                    <p style="color: #495057; margin: 0 0 4px 0; font-size: 14px;">Email: reservations@gardenofmemories.ph</p>
+                    <p style="color: #495057; margin: 0 0 4px 0; font-size: 14px;">Office: Garden of Memories Memorial Park, Pateros</p>
+                    <p style="color: #495057; margin: 0; font-size: 14px;">Hours: Mon-Fri 9AM-5PM, Weekends 10AM-4PM</p>
+                  </div>
+                </div>
               </div>
 
-              <p style="margin-top: 30px;">Thank you for choosing Garden of Memories Memorial Park. We appreciate your trust in our services and will contact you shortly!</p>
-              
-              <p>Best regards,<br><strong>Garden of Memories Memorial Park Team</strong></p>
+              <!-- Footer -->
+              <div style="background-color: #f8f9fa; padding: 24px 40px; text-align: center; border-top: 1px solid #e9ecef;">
+                <p style="color: #6c757d; margin: 0 0 8px 0; font-size: 13px;">© 2024 Garden of Memories Memorial Park</p>
+                <p style="color: #adb5bd; margin: 0; font-size: 12px;">Pateros, Philippines</p>
+                <p style="color: #adb5bd; margin: 8px 0 0 0; font-size: 11px;">This confirmation was sent after payment proof upload via our AI Assistant chatbot.</p>
+              </div>
             </div>
-            
-            <div style="background: #333; color: white; padding: 15px; text-align: center;">
-              <p style="margin: 0; font-size: 12px;">© 2024 Garden of Memories Memorial Park. All rights reserved.</p>
-              <p style="margin: 5px 0 0 0; font-size: 10px;">This confirmation was sent after payment proof upload via our AI Assistant chatbot.</p>
-            </div>
-          </div>
+          </body>
+          </html>
       `;
 
       const encodedMessage = Buffer.from(
