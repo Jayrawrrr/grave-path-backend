@@ -84,55 +84,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Seed initial dummy plots
-router.post('/seed', async (req, res) => {
-  try {
-    const dummyPlots = [
-      {
-        id: 'A1',
-        name: 'Plot A1',
-        status: 'available',
-        bounds: [[0.4, 0.4], [0.41, 0.41]],
-        sqm: 12.5,
-        location: 'East, near Main Gate'
-      },
-      {
-        id: 'A2',
-        name: 'Plot A2',
-        status: 'available',
-        bounds: [[0.4, 0.45], [0.41, 0.46]],
-        sqm: 12.5,
-        location: 'East, near Main Gate'
-      },
-      {
-        id: 'B1',
-        name: 'Plot B1',
-        status: 'available',
-        bounds: [[0.45, 0.4], [0.46, 0.41]],
-        sqm: 12.5,
-        location: 'West, beside Chapel'
-      },
-      {
-        id: 'B2',
-        name: 'Plot B2',
-        status: 'available',
-        bounds: [[0.45, 0.45], [0.46, 0.46]],
-        sqm: 12.5,
-        location: 'West, beside Chapel'
-      }
-    ];
-
-    // Clear existing lots first
-    await Lot.deleteMany({});
-    
-    // Insert the dummy plots
-    const created = await Lot.insertMany(dummyPlots);
-    res.status(201).json(created);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Failed to seed lots', error: err.message });
-  }
-});
 
 router.get('/availability', async (req, res) => {
   try {
