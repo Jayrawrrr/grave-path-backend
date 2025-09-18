@@ -169,6 +169,13 @@ router.post('/import', async (req, res) => {
     // Use the data directly from the imported file
     const geoJsonData = gardenAData;
     
+    console.log('GeoJSON data structure:', {
+      hasData: !!geoJsonData,
+      hasFeatures: !!geoJsonData?.features,
+      featuresCount: geoJsonData?.features?.length,
+      firstFeature: geoJsonData?.features?.[0]
+    });
+    
     if (!geoJsonData || !geoJsonData.features) {
       return res.status(400).json({ msg: 'Invalid GeoJSON data' });
     }
@@ -181,7 +188,7 @@ router.post('/import', async (req, res) => {
     
     // Process each feature from GeoJSON
     for (const feature of geoJsonData.features) {
-      if (feature.properties.type === 'grave' || feature.properties.type === 'niche') {
+      if (feature.properties && (feature.properties.type === 'grave' || feature.properties.type === 'niche')) {
         const props = feature.properties;
         const coords = feature.geometry.coordinates[0]; // First ring of polygon
         
