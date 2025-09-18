@@ -37,6 +37,8 @@ import clientColumbarium from './routes/client/columbarium.js';
 import adminChatbot from './routes/admin/chatbot.js';
 import adminVisitorInfo from './routes/admin/visitorInfo.js';
 import adminGraves from './routes/admin/graves.js';
+import adminGardenA from './routes/admin/gardenA.js';
+import publicGardenA from './routes/public/gardenA.js';
 
 dotenv.config();
 const app = express();
@@ -130,6 +132,7 @@ app.use('/api/admin/columbarium', adminColumbarium);
 app.use('/api/admin/chatbot', adminChatbot);
 app.use('/api/admin/visitor-info', adminVisitorInfo);
 app.use('/api/admin/graves', adminGraves);
+app.use('/api/admin/garden-a', adminGardenA);
 
 // Payment
 app.use('/api/payment', paymentRouter);
@@ -144,6 +147,7 @@ app.use('/api/chatbot', chatbotRouter);
 app.use('/api/public/lots', publicLots);
 app.use('/api/public/announcements', publicAnnouncements);
 app.use('/api/public-access/info', publicInfo);
+app.use('/api/public/garden-a', publicGardenA);
 
 // Connect to MongoDB & start server
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI)
