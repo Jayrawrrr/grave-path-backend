@@ -174,8 +174,10 @@ router.post('/import', async (req, res) => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_A.geojson');
+    console.log('Looking for GeoJSON file at:', geoJsonPath);
     
     if (!fs.existsSync(geoJsonPath)) {
+      console.error('GeoJSON file not found at:', geoJsonPath);
       return res.status(400).json({ msg: 'Garden A GeoJSON file not found' });
     }
     
