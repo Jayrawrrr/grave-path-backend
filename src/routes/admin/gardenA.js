@@ -169,12 +169,7 @@ router.post('/import', async (req, res) => {
     // Use the data directly from the imported file
     const geoJsonData = gardenAData;
     
-    console.log('GeoJSON data structure:', {
-      hasData: !!geoJsonData,
-      hasFeatures: !!geoJsonData?.features,
-      featuresCount: geoJsonData?.features?.length,
-      firstFeature: geoJsonData?.features?.[0]
-    });
+    console.log('Importing Garden A data:', geoJsonData?.features?.length || 0, 'features');
     
     if (!geoJsonData || !geoJsonData.features) {
       return res.status(400).json({ msg: 'Invalid GeoJSON data' });
