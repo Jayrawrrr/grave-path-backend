@@ -1,0 +1,26 @@
+[
+  {
+    "featureId": "grave_1_1",
+    "type": "grave",
+    "name": "Grave 1-1",
+    "row": 1,
+    "column": 1,
+    "status": "available",
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [[[121.069412, 14.538799], [121.0699, 14.538781], [121.069888, 14.538398], [121.0694, 14.538416], [121.069412, 14.538799]]]
+    },
+    "centerCoordinates": {
+      "type": "Point",
+      "coordinates": [121.069656, 14.538598]
+    },
+    "bounds": {
+      "southwest": [14.538398, 121.0694],
+      "northeast": [14.538799, 121.0699]
+    },
+    "sqm": 2,
+    "price": 50000,
+    "birth": "",
+    "death": ""
+  }
+]

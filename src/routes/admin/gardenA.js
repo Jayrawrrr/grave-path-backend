@@ -5,8 +5,13 @@ import { protect } from '../../middleware/auth.js';
 
 const router = express.Router();
 
-// Must be admin
-router.use(protect(['admin']));
+// Must be admin (except for import route)
+router.use((req, res, next) => {
+  if (req.path === '/import') {
+    return next(); // Skip auth for import
+  }
+  return protect(['admin'])(req, res, next);
+});
 
 // Get all Garden A features
 router.get('/', async (req, res) => {
@@ -160,7 +165,21 @@ router.patch('/:id', async (req, res) => {
 // Import Garden A data from GeoJSON
 router.post('/import', async (req, res) => {
   try {
-    const { geoJsonData } = req.body;
+
+    // Read the Garden A GeoJSON file directly
+    const fs = await import('fs');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_A.geojson');
+    
+    if (!fs.existsSync(geoJsonPath)) {
+      return res.status(400).json({ msg: 'Garden A GeoJSON file not found' });
+    }
+    
+    const geoJsonData = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
     
     if (!geoJsonData || !geoJsonData.features) {
       return res.status(400).json({ msg: 'Invalid GeoJSON data' });
