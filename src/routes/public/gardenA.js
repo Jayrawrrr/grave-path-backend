@@ -1,26 +1,21 @@
 // backend/src/routes/public/gardenA.js
 import express from 'express';
 import GardenA from '../../models/GardenA.js';
+import { gardenAData } from '../../data/gardenA.js';
 
 const router = express.Router();
+
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.json({ message: 'Garden A API is working!' });
+});
 
 // Public endpoint to get Garden A features directly from GeoJSON file
 // Used by guest users to view Garden A 3D map data
 router.get('/', async (req, res) => {
   try {
-    const fs = await import('fs');
-    const path = await import('path');
-    const { fileURLToPath } = await import('url');
-    
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_A.geojson');
-    
-    if (!fs.existsSync(geoJsonPath)) {
-      return res.status(404).json({ msg: 'Garden A GeoJSON file not found' });
-    }
-    
-    const geoJsonData = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
+    // Use the data directly from the imported file
+    const geoJsonData = gardenAData;
     
     // Filter by type if specified
     const { type } = req.query;

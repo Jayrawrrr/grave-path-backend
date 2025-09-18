@@ -2,6 +2,7 @@
 import express from 'express';
 import GardenA from '../../models/GardenA.js';
 import { protect } from '../../middleware/auth.js';
+import { gardenAData } from '../../data/gardenA.js';
 
 const router = express.Router();
 
@@ -162,26 +163,11 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-// Import Garden A data from GeoJSON
+// Import Garden A data from embedded GeoJSON
 router.post('/import', async (req, res) => {
   try {
-
-    // Read the Garden A GeoJSON file directly
-    const fs = await import('fs');
-    const path = await import('path');
-    const { fileURLToPath } = await import('url');
-    
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_A.geojson');
-    console.log('Looking for GeoJSON file at:', geoJsonPath);
-    
-    if (!fs.existsSync(geoJsonPath)) {
-      console.error('GeoJSON file not found at:', geoJsonPath);
-      return res.status(400).json({ msg: 'Garden A GeoJSON file not found' });
-    }
-    
-    const geoJsonData = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
+    // Use the data directly from the imported file
+    const geoJsonData = gardenAData;
     
     if (!geoJsonData || !geoJsonData.features) {
       return res.status(400).json({ msg: 'Invalid GeoJSON data' });
