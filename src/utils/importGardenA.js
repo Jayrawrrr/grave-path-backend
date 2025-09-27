@@ -19,7 +19,7 @@ async function importGardenAData() {
     console.log('Connected to MongoDB');
 
     // Read the Garden A GeoJSON file
-    const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_A.geojson');
+    const geoJsonPath = path.join(__dirname, '../../data/Garden_A.geojson');
     
     if (!fs.existsSync(geoJsonPath)) {
       throw new Error(`Garden A GeoJSON file not found at: ${geoJsonPath}`);

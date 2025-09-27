@@ -39,7 +39,7 @@ router.get('/statistics', async (req, res) => {
     
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_A.geojson');
+    const geoJsonPath = path.join(__dirname, '../../../data/Garden_A.geojson');
     
     if (!fs.existsSync(geoJsonPath)) {
       return res.status(404).json({ msg: 'Garden A GeoJSON file not found' });
@@ -74,7 +74,7 @@ router.get('/:id', async (req, res) => {
     
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_A.geojson');
+    const geoJsonPath = path.join(__dirname, '../../../data/Garden_A.geojson');
     
     if (!fs.existsSync(geoJsonPath)) {
       return res.status(404).json({ msg: 'Garden A GeoJSON file not found' });
