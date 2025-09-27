@@ -52,16 +52,28 @@ const app = express();
 const allowedOrigins = [
   'https://grave-path.com',
   'https://www.grave-path.com',
+  'https://staff.grave-path.com',
+  'https://admin.grave-path.com',
+  'http://localhost:3000',
+  'http://localhost:3001',
   process.env.FRONTEND_URL
 ].filter(Boolean); // Remove undefined values
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow if origin is in allowedOrigins
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
+    
+    // Log the blocked origin for debugging
+    console.log('CORS blocked origin:', origin);
+    console.log('Allowed origins:', allowedOrigins);
+    
+    callback(new Error("Not allowed by CORS"));
   },
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
