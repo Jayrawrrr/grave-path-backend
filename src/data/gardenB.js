@@ -2,6 +2,14 @@
 // Garden B GeoJSON data - 3D implementation
 // This file imports the real Garden B GeoJSON data from the public folder
 
-import gardenBGeoJSON from '../../../staff-dashboard/public/data/Garden_B.geojson' assert { type: 'json' };
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const geoJsonPath = path.join(__dirname, '../../../staff-dashboard/public/data/Garden_B.geojson');
+const gardenBGeoJSON = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
 
 export const gardenBData = gardenBGeoJSON;
