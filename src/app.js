@@ -38,7 +38,13 @@ import adminChatbot from './routes/admin/chatbot.js';
 import adminVisitorInfo from './routes/admin/visitorInfo.js';
 import adminGraves from './routes/admin/graves.js';
 import adminGardenA from './routes/admin/gardenA.js';
+import adminGardenB from './routes/admin/gardenB.js';
+import adminGardenC from './routes/admin/gardenC.js';
+import adminGardenD from './routes/admin/gardenD.js';
 import publicGardenA from './routes/public/gardenA.js';
+import publicGardenB from './routes/public/gardenB.js';
+import publicGardenC from './routes/public/gardenC.js';
+import publicGardenD from './routes/public/gardenD.js';
 
 dotenv.config();
 const app = express();
@@ -133,6 +139,9 @@ app.use('/api/admin/chatbot', adminChatbot);
 app.use('/api/admin/visitor-info', adminVisitorInfo);
 app.use('/api/admin/graves', adminGraves);
 app.use('/api/admin/garden-a', adminGardenA);
+app.use('/api/admin/garden-b', adminGardenB);
+app.use('/api/admin/garden-c', adminGardenC);
+app.use('/api/admin/garden-d', adminGardenD);
 
 // Payment
 app.use('/api/payment', paymentRouter);
@@ -148,6 +157,9 @@ app.use('/api/public/lots', publicLots);
 app.use('/api/public/announcements', publicAnnouncements);
 app.use('/api/public-access/info', publicInfo);
 app.use('/api/public/garden-a', publicGardenA);
+app.use('/api/public/garden-b', publicGardenB);
+app.use('/api/public/garden-c', publicGardenC);
+app.use('/api/public/garden-d', publicGardenD);
 
 // Connect to MongoDB & start server
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI)
