@@ -1,0 +1,78 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "main-building",
+        "properties": {
+          "name": "Main Building",
+          "category": "landmark"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [121.069217, 14.538334]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "chapel",
+        "properties": {
+          "name": "Chapel",
+          "category": "landmark"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [121.071317, 14.537649]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "columbarium",
+        "properties": {
+          "name": "Columbarium",
+          "category": "landmark"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [121.069129, 14.538037]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "restroom-1",
+        "properties": {
+          "name": "Restroom 1",
+          "category": "landmark"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [121.071879, 14.538307]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "restroom-2",
+        "properties": {
+          "name": "Restroom 2",
+          "category": "landmark"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [121.072004, 14.538719]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "restroom-3",
+        "properties": {
+          "name": "Restroom 3",
+          "category": "landmark"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [121.071708, 14.539057]
+        }
+      }
+    ]
+  }
+  

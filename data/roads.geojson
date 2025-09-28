@@ -1,0 +1,300 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "main-entrance-road",
+        "properties": {
+          "name": "Main Entrance Road",
+          "category": "road",
+          "type": "main",
+          "access": "vehicle",
+          "cost": 1,
+          "description": "Primary entrance road from main gate"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.068655, 14.538215],
+            [121.069128, 14.538134],
+            [121.069891, 14.538123],
+            [121.070494, 14.538094],
+            [121.071009, 14.537904]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "central-loop",
+        "properties": {
+          "name": "Central Loop Road",
+          "category": "road",
+          "type": "main",
+          "access": "vehicle",
+          "cost": 1,
+          "description": "Main loop connecting all gardens"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.069891, 14.538123],
+            [121.069854, 14.537866],
+            [121.070484, 14.537852],
+            [121.070484, 14.537673],
+            [121.069842, 14.537695],
+            [121.070478, 14.537501],
+            [121.070467, 14.537189],
+            [121.069127, 14.537029],
+            [121.069468, 14.537538]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "northern-road",
+        "properties": {
+          "name": "Northern Cemetery Road",
+          "category": "road",
+          "type": "main",
+          "access": "vehicle",
+          "cost": 1,
+          "description": "Northern perimeter road"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.069406, 14.538807],
+            [121.070623, 14.538781],
+            [121.071284, 14.538775],
+            [121.071977, 14.538766],
+            [121.072315, 14.538786]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "eastern-road",
+        "properties": {
+          "name": "Eastern Cemetery Road",
+          "category": "road",
+          "type": "main",
+          "access": "vehicle",
+          "cost": 1,
+          "description": "Eastern section connecting to chapel"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.071009, 14.537904],
+            [121.071943, 14.537859],
+            [121.072582, 14.538089],
+            [121.073448, 14.537161]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "garden-a-access",
+        "properties": {
+          "name": "Western Garden Access",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Access to Garden A"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.069891, 14.538123],
+            [121.069403, 14.538394],
+            [121.069388, 14.538127]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "garden-b-access",
+        "properties": {
+          "name": "Garden B Access Path",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Direct access to Garden B"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.070494, 14.538094],
+            [121.070498, 14.538374],
+            [121.070754, 14.538371]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "garden-c-main",
+        "properties": {
+          "name": "Garden C Main Path",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Primary path through Garden C"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.071337, 14.537872],
+            [121.071439, 14.538099],
+            [121.071329, 14.538364],
+            [121.071802, 14.538356]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "chapel-access",
+        "properties": {
+          "name": "Chapel Access Road",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Road to chapel area"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.071009, 14.537904],
+            [121.071039, 14.536961],
+            [121.071545, 14.537557],
+            [121.071937, 14.537858]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "service-north",
+        "properties": {
+          "name": "Service Road North",
+          "category": "pathway",
+          "type": "service",
+          "access": "maintenance",
+          "cost": 3,
+          "description": "Northern service pathway"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.069331, 14.539142],
+            [121.070621, 14.538781]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "eastern-walkway",
+        "properties": {
+          "name": "Eastern Walkway",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Eastern pedestrian path"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.072315, 14.538786],
+            [121.072471, 14.538051],
+            [121.072697, 14.537879]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "columbarium-circuit",
+        "properties": {
+          "name": "Columbarium Circuit",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Path around columbarium"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.069388, 14.538127],
+            [121.069127, 14.537029],
+            [121.070475, 14.537006],
+            [121.071000, 14.537008]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "garden-connector",
+        "properties": {
+          "name": "Garden Connector Path",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Connects all three gardens"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.069403, 14.538394],
+            [121.070611, 14.538762],
+            [121.071329, 14.538364]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "restroom-access",
+        "properties": {
+          "name": "Restroom Access Path",
+          "category": "pathway",
+          "type": "pedestrian",
+          "access": "walk",
+          "cost": 2,
+          "description": "Access to restroom facilities"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.071802, 14.538356],
+            [121.072004, 14.538719],
+            [121.071287, 14.539065]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "southern-service",
+        "properties": {
+          "name": "Southern Service Path",
+          "category": "pathway",
+          "type": "service",
+          "access": "maintenance",
+          "cost": 3,
+          "description": "Southern maintenance access"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [121.071221, 14.536659],
+            [121.071037, 14.536959],
+            [121.071092, 14.53673],
+            [121.07122, 14.536657]
+          ]
+        }
+      }
+    ]
+  }
+  

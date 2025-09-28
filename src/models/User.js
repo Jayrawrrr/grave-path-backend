@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
     memberSince:      { type: Date, default: Date.now },
     totalReservations: { type: Number, default: 0 },
     preferredPaymentMethod: { type: String, default: '' },
-    bookmarks:        [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lot' }] // Bookmarked lots
+    bookmarks:        [{ type: String }] // Bookmarked lot IDs (strings like A-123-456)
   },
   
   staffData: {
