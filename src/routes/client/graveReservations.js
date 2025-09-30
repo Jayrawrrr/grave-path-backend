@@ -73,6 +73,27 @@ router.post('/', protect(['client']), upload.single('proofImage'), async (req, r
         row: parseInt(row),
         column: parseInt(column)
       });
+    } else if (garden === 'B') {
+      const GardenB = (await import('../../models/GardenB.js')).default;
+      grave = await GardenB.findOne({ 
+        type: 'grave',
+        row: parseInt(row),
+        column: parseInt(column)
+      });
+    } else if (garden === 'C') {
+      const GardenC = (await import('../../models/GardenC.js')).default;
+      grave = await GardenC.findOne({ 
+        type: 'grave',
+        row: parseInt(row),
+        column: parseInt(column)
+      });
+    } else if (garden === 'D') {
+      const GardenD = (await import('../../models/GardenD.js')).default;
+      grave = await GardenD.findOne({ 
+        type: 'grave',
+        row: parseInt(row),
+        column: parseInt(column)
+      });
     } else {
       grave = await Lot.findOne({ id: graveId });
     }

@@ -144,6 +144,27 @@ router.post('/', protect(['admin', 'staff']), upload.single('proofImage'), async
         row: parseInt(row),
         column: parseInt(column)
       });
+    } else if (garden === 'B') {
+      const GardenB = (await import('../../models/GardenB.js')).default;
+      grave = await GardenB.findOne({ 
+        type: 'grave',
+        row: parseInt(row),
+        column: parseInt(column)
+      });
+    } else if (garden === 'C') {
+      const GardenC = (await import('../../models/GardenC.js')).default;
+      grave = await GardenC.findOne({ 
+        type: 'grave',
+        row: parseInt(row),
+        column: parseInt(column)
+      });
+    } else if (garden === 'D') {
+      const GardenD = (await import('../../models/GardenD.js')).default;
+      grave = await GardenD.findOne({ 
+        type: 'grave',
+        row: parseInt(row),
+        column: parseInt(column)
+      });
     } else {
       grave = await Lot.findOne({ id: graveId });
     }
@@ -229,6 +250,27 @@ router.put('/:id/status', protect(['admin', 'staff']), async (req, res) => {
         row: reservation.row,
         column: reservation.column
       });
+    } else if (reservation.garden === 'B') {
+      const GardenB = (await import('../../models/GardenB.js')).default;
+      grave = await GardenB.findOne({ 
+        type: 'grave',
+        row: reservation.row,
+        column: reservation.column
+      });
+    } else if (reservation.garden === 'C') {
+      const GardenC = (await import('../../models/GardenC.js')).default;
+      grave = await GardenC.findOne({ 
+        type: 'grave',
+        row: reservation.row,
+        column: reservation.column
+      });
+    } else if (reservation.garden === 'D') {
+      const GardenD = (await import('../../models/GardenD.js')).default;
+      grave = await GardenD.findOne({ 
+        type: 'grave',
+        row: reservation.row,
+        column: reservation.column
+      });
     } else {
       grave = await Lot.findOne({ id: reservation.graveId });
     }
@@ -275,6 +317,27 @@ router.delete('/:id', protect(['admin']), async (req, res) => {
     let grave;
     if (reservation.garden === 'A') {
       grave = await GardenA.findOne({ 
+        type: 'grave',
+        row: reservation.row,
+        column: reservation.column
+      });
+    } else if (reservation.garden === 'B') {
+      const GardenB = (await import('../../models/GardenB.js')).default;
+      grave = await GardenB.findOne({ 
+        type: 'grave',
+        row: reservation.row,
+        column: reservation.column
+      });
+    } else if (reservation.garden === 'C') {
+      const GardenC = (await import('../../models/GardenC.js')).default;
+      grave = await GardenC.findOne({ 
+        type: 'grave',
+        row: reservation.row,
+        column: reservation.column
+      });
+    } else if (reservation.garden === 'D') {
+      const GardenD = (await import('../../models/GardenD.js')).default;
+      grave = await GardenD.findOne({ 
         type: 'grave',
         row: reservation.row,
         column: reservation.column
