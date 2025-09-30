@@ -116,13 +116,14 @@ router.post('/', protect(['client']), upload.single('proofImage'), async (req, r
       return res.status(400).json({ message: 'This grave already has a pending or approved reservation' });
     }
 
-    // Validate payment amount (should match or exceed grave price)
+    // Validate payment amount (accept reservation fee - 10% of total price)
     const paymentAmountNum = parseFloat(paymentAmount);
     const gravePrice = grave.price || 8000;
+    const minimumReservationFee = gravePrice * 0.10; // 10% reservation fee
     
-    if (paymentAmountNum < gravePrice) {
+    if (paymentAmountNum < minimumReservationFee) {
       return res.status(400).json({ 
-        message: `Payment amount must be at least ₱${gravePrice}` 
+        message: `Payment amount must be at least ₱${minimumReservationFee} (10% reservation fee)` 
       });
     }
 
