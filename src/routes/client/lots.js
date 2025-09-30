@@ -137,9 +137,16 @@ router.get('/bookmarks', protect(['client']), async (req, res) => {
     // Combine database lots with GeoJSON bookmarks
     const allBookmarks = [...dbLots, ...geoJsonBookmarks];
     
-    // Filter out any invalid bookmarks
+    // Filter out any invalid bookmarks (include landmarks with 'active' status)
     const validBookmarks = allBookmarks.filter(lot => 
-      lot && (lot.status === 'unavailable' || lot.status === 'confirmed' || lot.status === 'reserved' || lot.status === 'active' || lot.status === 'occupied')
+      lot && (
+        lot.status === 'unavailable' || 
+        lot.status === 'confirmed' || 
+        lot.status === 'reserved' || 
+        lot.status === 'active' || 
+        lot.status === 'occupied' ||
+        lot.type === 'landmark' // Always include landmarks regardless of status
+      )
     );
 
     res.json(validBookmarks);

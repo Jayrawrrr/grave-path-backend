@@ -45,6 +45,8 @@ import publicGardenA from './routes/public/gardenA.js';
 import publicGardenB from './routes/public/gardenB.js';
 import publicGardenC from './routes/public/gardenC.js';
 import publicGardenD from './routes/public/gardenD.js';
+import adminGraveReservations from './routes/admin/graveReservations.js';
+import clientGraveReservations from './routes/client/graveReservations.js';
 
 dotenv.config();
 const app = express();
@@ -111,12 +113,16 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Create uploads directories if they don't exist
 const uploadsDir = path.join(__dirname, '../uploads');
 const proofsDir = path.join(__dirname, '../uploads/proofs');
+const proofPaymentsDir = path.join(__dirname, '../uploads/proof-payments');
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 if (!fs.existsSync(proofsDir)) {
   fs.mkdirSync(proofsDir, { recursive: true });
+}
+if (!fs.existsSync(proofPaymentsDir)) {
+  fs.mkdirSync(proofPaymentsDir, { recursive: true });
 }
 
 // Health-check
@@ -138,6 +144,7 @@ app.use('/api/client/lots', clientLots);
 app.use('/api/client/reservations', clientReservations);
 app.use('/api/client/announcements', clientAnnouncements);
 app.use('/api/client/columbarium', clientColumbarium);
+app.use('/api/client/grave-reservations', clientGraveReservations);
 
 // Admin routes
 app.use('/api/admin/users', adminUsers);
@@ -154,6 +161,7 @@ app.use('/api/admin/garden-a', adminGardenA);
 app.use('/api/admin/garden-b', adminGardenB);
 app.use('/api/admin/garden-c', adminGardenC);
 app.use('/api/admin/garden-d', adminGardenD);
+app.use('/api/admin/grave-reservations', adminGraveReservations);
 
 // Payment
 app.use('/api/payment', paymentRouter);

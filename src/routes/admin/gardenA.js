@@ -163,6 +163,21 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+// Status generation function - matches MapboxMap.jsx
+const getRealisticStatus = (name, row, column) => {
+  const hash = (name + row + column).split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+  
+  const random = Math.abs(hash) % 100;
+  
+  if (random < 60) return 'available';      // 60% available
+  if (random < 85) return 'occupied';       // 25% occupied  
+  if (random < 95) return 'reserved';       // 10% reserved
+  return 'unavailable';                      // 5% unavailable
+};
+
 // Import Garden A data from embedded GeoJSON
 router.post('/import', async (req, res) => {
   try {
@@ -180,6 +195,7 @@ router.post('/import', async (req, res) => {
     console.log('Cleared existing Garden A data');
     
     const features = [];
+    let statusCounts = { available: 0, occupied: 0, reserved: 0, unavailable: 0 };
     
     // Process each feature from GeoJSON
     for (const feature of geoJsonData.features) {
@@ -199,12 +215,24 @@ router.post('/import', async (req, res) => {
         const centerLng = (minLng + maxLng) / 2;
         const centerLat = (minLat + maxLat) / 2;
         
+        const row = props.row || props.grave_row;
+        const column = props.column || props.grave_column;
+        const name = props.name || `${props.type}_${row}_${column}`;
+        
+        // Generate realistic randomized status
+        const status = getRealisticStatus(name, row, column);
+        
+        // Count status distribution for graves
+        if (props.type === 'grave') {
+          statusCounts[status]++;
+        }
+        
         const gardenAFeature = {
-          featureId: feature.id || `${props.type}_${props.name}`,
+          featureId: feature.id || `${props.type}_${name}`,
           type: props.type,
-          name: props.name || '',
-          row: props.row || props.grave_row,
-          column: props.column || props.grave_column,
+          name: name,
+          row: row,
+          column: column,
           graveRow: props.grave_row,
           graveColumn: props.grave_column,
           geometry: feature.geometry,
@@ -216,9 +244,9 @@ router.post('/import', async (req, res) => {
             southwest: [minLat, minLng],
             northeast: [maxLat, maxLng]
           },
-          status: 'available',
+          status: status, // Real randomized status matching MapboxMap
           sqm: props.type === 'grave' ? 2.0 : 1.0,
-          price: props.type === 'grave' ? 50000 : 25000,
+          price: props.type === 'grave' ? 8000 : 4000,
           source: 'Garden_A.geojson'
         };
         
@@ -237,11 +265,25 @@ router.post('/import', async (req, res) => {
       console.log(`Inserted ${inserted}/${features.length} Garden A features`);
     }
     
+    const totalGraves = features.filter(f => f.type === 'grave').length;
+    
     res.json({
-      message: `Successfully imported ${features.length} Garden A features`,
+      message: `Successfully imported ${features.length} Garden A features with randomized status`,
       count: features.length,
-      graves: features.filter(f => f.type === 'grave').length,
-      niches: features.filter(f => f.type === 'niche').length
+      graves: totalGraves,
+      niches: features.filter(f => f.type === 'niche').length,
+      statusDistribution: {
+        available: statusCounts.available,
+        occupied: statusCounts.occupied,
+        reserved: statusCounts.reserved,
+        unavailable: statusCounts.unavailable,
+        percentages: {
+          available: `${((statusCounts.available/totalGraves)*100).toFixed(1)}%`,
+          occupied: `${((statusCounts.occupied/totalGraves)*100).toFixed(1)}%`,
+          reserved: `${((statusCounts.reserved/totalGraves)*100).toFixed(1)}%`,
+          unavailable: `${((statusCounts.unavailable/totalGraves)*100).toFixed(1)}%`
+        }
+      }
     });
     
   } catch (err) {
