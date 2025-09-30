@@ -87,7 +87,7 @@ router.get('/stats', async (req, res) => {
 // Get specific Garden B feature by ID
 router.get('/:id', async (req, res) => {
   try {
-    const feature = await GardenB.findById(req.params.id);
+    const feature = await GardenB.findOne({ featureId: req.params.id });
     
     if (!feature) {
       return res.status(404).json({ msg: 'Garden B feature not found' });
@@ -96,6 +96,35 @@ router.get('/:id', async (req, res) => {
     res.json(feature);
   } catch (err) {
     console.error('Error fetching Garden B feature:', err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+// Update Garden B feature status (PATCH for status only)
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    
+    if (!['available', 'occupied', 'reserved', 'maintenance', 'unavailable'].includes(status)) {
+      return res.status(400).json({ msg: 'Invalid status' });
+    }
+    
+    const feature = await GardenB.findOneAndUpdate(
+      { featureId: req.params.id },
+      { 
+        status,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+    
+    if (!feature) {
+      return res.status(404).json({ msg: 'Garden B feature not found' });
+    }
+    
+    res.json(feature);
+  } catch (err) {
+    console.error('Error updating Garden B feature status:', err);
     res.status(500).json({ msg: 'Server error' });
   }
 });

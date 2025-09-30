@@ -4,6 +4,7 @@ import GraveReservation from '../../models/GraveReservation.js';
 import GardenA from '../../models/GardenA.js';
 import Lot from '../../models/Lot.js';
 import { protect } from '../../middleware/auth.js';
+import { sendReservationConfirmation } from '../../utils/emailService.js';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -158,8 +159,23 @@ router.post('/', protect(['client']), upload.single('proofImage'), async (req, r
     grave.status = 'reserved';
     await grave.save();
 
+    // Send confirmation email
+    try {
+      await sendReservationConfirmation(clientEmail, {
+        graveId,
+        garden,
+        row: parseInt(row),
+        column: parseInt(column),
+        clientName,
+        status: 'pending'
+      });
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the reservation if email fails
+    }
+
     res.status(201).json({
-      message: 'Reservation submitted successfully. It will be reviewed by our staff.',
+      message: 'Reservation submitted successfully. A confirmation email has been sent.',
       reservation: {
         _id: reservation._id,
         graveId: reservation.graveId,

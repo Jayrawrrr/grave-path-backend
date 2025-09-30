@@ -4,6 +4,7 @@ import GraveReservation from '../../models/GraveReservation.js';
 import GardenA from '../../models/GardenA.js';
 import Lot from '../../models/Lot.js';
 import { protect } from '../../middleware/auth.js';
+import { sendReservationStatusUpdate } from '../../utils/emailService.js';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -293,8 +294,26 @@ router.put('/:id/status', protect(['admin', 'staff']), async (req, res) => {
       await grave.save();
     }
     
+    // Send status update email
+    if (status === 'approved' || status === 'rejected') {
+      try {
+        await sendReservationStatusUpdate(reservation.clientEmail, {
+          graveId: reservation.graveId,
+          garden: reservation.garden,
+          row: reservation.row,
+          column: reservation.column,
+          clientName: reservation.clientName,
+          status: status,
+          rejectionReason: rejectionReason || ''
+        });
+      } catch (emailError) {
+        console.error('Failed to send status update email:', emailError);
+        // Don't fail the status update if email fails
+      }
+    }
+    
     res.json({
-      message: `Reservation ${status} successfully`,
+      message: `Reservation ${status} successfully. Email notification sent.`,
       reservation,
       graveStatusUpdated: grave ? grave.status : null
     });
