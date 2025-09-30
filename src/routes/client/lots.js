@@ -30,14 +30,16 @@ router.post('/:id/bookmark', protect(['client']), async (req, res) => {
     // Check if lot exists in database
     const lot = await Lot.findOne({ id: id });
     
-    // If not in database, check if it's a valid GeoJSON grave format
+    // If not in database, check if it's a valid GeoJSON grave or landmark
     if (!lot) {
-      // Validate the ID format (A-123-456, B-123-456, etc.)
-      const validIdPattern = /^[ABCD]-\d+-\d+$/;
-      if (!validIdPattern.test(id)) {
-        return res.status(404).json({ msg: 'Invalid lot ID format' });
+      // Validate the ID format (A-123-456, B-123-456, etc. OR landmark names)
+      const validGraveIdPattern = /^[ABCD]-\d+-\d+$/;
+      const validLandmarkPattern = /^[a-z0-9-]+$/; // Allows landmark IDs like 'main-building', 'chapel', etc.
+      
+      if (!validGraveIdPattern.test(id) && !validLandmarkPattern.test(id)) {
+        return res.status(404).json({ msg: 'Invalid lot or landmark ID format' });
       }
-      // Allow bookmarking valid GeoJSON graves even if not in database
+      // Allow bookmarking valid GeoJSON graves and landmarks even if not in database
     } else {
       // If in database, check status
       const validStatuses = ['unavailable', 'confirmed', 'reserved', 'active', 'occupied'];
@@ -99,20 +101,38 @@ router.get('/bookmarks', protect(['client']), async (req, res) => {
     // Fetch lots from database that match the bookmark IDs
     const dbLots = await Lot.find({ id: { $in: bookmarkIds } });
     
-    // Also handle GeoJSON graves (not in database) by creating mock objects
+    // Also handle GeoJSON graves and landmarks (not in database) by creating mock objects
     const geoJsonBookmarks = bookmarkIds
       .filter(id => !dbLots.find(lot => lot.id === id))
-      .filter(id => /^[ABCD]-\d+-\d+$/.test(id)) // Valid GeoJSON format
-      .map(id => ({
-        _id: id, // Use the ID as _id for consistency
-        id: id,
-        name: `Grave ${id}`,
-        status: 'occupied',
-        garden: id.charAt(0), // A, B, C, or D
-        location: `Garden ${id.charAt(0)}`,
-        type: 'grave',
-        isFromGeoJSON: true
-      }));
+      .map(id => {
+        // Check if it's a grave (A-123-456 format)
+        if (/^[ABCD]-\d+-\d+$/.test(id)) {
+          return {
+            _id: id,
+            id: id,
+            name: `Grave ${id}`,
+            status: 'occupied',
+            garden: id.charAt(0),
+            location: `Garden ${id.charAt(0)}`,
+            type: 'grave',
+            isFromGeoJSON: true
+          };
+        }
+        // Otherwise it's a landmark
+        else if (/^[a-z0-9-]+$/.test(id)) {
+          return {
+            _id: id,
+            id: id,
+            name: id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+            status: 'active',
+            type: 'landmark',
+            category: 'Facility',
+            isFromGeoJSON: true
+          };
+        }
+        return null;
+      })
+      .filter(item => item !== null);
 
     // Combine database lots with GeoJSON bookmarks
     const allBookmarks = [...dbLots, ...geoJsonBookmarks];
