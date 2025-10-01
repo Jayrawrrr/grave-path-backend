@@ -3,10 +3,53 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
   // Basic information
-  firstName:        { type: String, default: '' },
-  lastName:         { type: String, default: '' },
-  email:            { type: String, required: true, unique: true },
-  password:         { type: String, default: '' },
+  firstName:        { 
+    type: String, 
+    default: '',
+    trim: true,
+    minlength: [2, 'First name must be at least 2 characters'],
+    maxlength: [20, 'First name must not exceed 20 characters'],
+    validate: {
+      validator: function(v) {
+        if (!v) return true; // Allow empty (handled by required if needed)
+        return /^[a-zA-Z\s\-']+$/.test(v); // Only letters, spaces, hyphens, apostrophes
+      },
+      message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
+    }
+  },
+  lastName:         { 
+    type: String, 
+    default: '',
+    trim: true,
+    minlength: [2, 'Last name must be at least 2 characters'],
+    maxlength: [20, 'Last name must not exceed 20 characters'],
+    validate: {
+      validator: function(v) {
+        if (!v) return true; // Allow empty (handled by required if needed)
+        return /^[a-zA-Z\s\-']+$/.test(v); // Only letters, spaces, hyphens, apostrophes
+      },
+      message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
+    }
+  },
+  email:            { 
+    type: String, 
+    required: true, 
+    unique: true,
+    trim: true,
+    lowercase: true,
+    maxlength: [30, 'Email must not exceed 30 characters'],
+    validate: {
+      validator: function(v) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: 'Please provide a valid email address'
+    }
+  },
+  password:         { 
+    type: String, 
+    default: '',
+    maxlength: [20, 'Password must not exceed 20 characters']
+  },
   role:             { type: String, enum: ['client','staff','admin'], default: 'client' },
   
   // Email verification
@@ -15,19 +58,30 @@ const userSchema = new mongoose.Schema({
   
   // Profile information
   profile: {
-    avatar:         { type: String, default: '' }, // URL to profile picture
-    phone:          { type: String, default: '' },
+    avatar:         { type: String, default: '', maxlength: 500 }, // URL to profile picture
+    phone:          { type: String, default: '', maxlength: 20 },
     address: {
-      street:       { type: String, default: '' },
-      city:         { type: String, default: '' },
-      state:        { type: String, default: '' },
-      zipCode:      { type: String, default: '' },
-      country:      { type: String, default: 'USA' }
+      street:       { type: String, default: '', maxlength: 200 },
+      city:         { type: String, default: '', maxlength: 100 },
+      state:        { type: String, default: '', maxlength: 100 },
+      zipCode:      { type: String, default: '', maxlength: 20 },
+      country:      { type: String, default: 'Philippines', maxlength: 100 }
     },
     emergencyContact: {
-      name:         { type: String, default: '' },
-      phone:        { type: String, default: '' },
-      relationship: { type: String, default: '' }
+      name:         { 
+        type: String, 
+        default: '', 
+        maxlength: 100,
+        validate: {
+          validator: function(v) {
+            if (!v) return true;
+            return /^[a-zA-Z\s\-']+$/.test(v);
+          },
+          message: 'Emergency contact name can only contain letters, spaces, hyphens, and apostrophes'
+        }
+      },
+      phone:        { type: String, default: '', maxlength: 20 },
+      relationship: { type: String, default: '', maxlength: 50 }
     },
     preferences: {
       notifications: {

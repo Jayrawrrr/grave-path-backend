@@ -209,13 +209,40 @@ router.post('/verify-code', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { firstName, lastName, email, password, role } = req.body;
+    
+    // Validate first name
+    if (!firstName || firstName.trim().length < 2 || firstName.trim().length > 20) {
+      return res.status(400).json({ msg: 'First name must be 2-20 characters' });
+    }
+    if (!/^[a-zA-Z\s\-']+$/.test(firstName.trim())) {
+      return res.status(400).json({ msg: 'First name can only contain letters, spaces, hyphens, and apostrophes' });
+    }
+    
+    // Validate last name
+    if (!lastName || lastName.trim().length < 2 || lastName.trim().length > 20) {
+      return res.status(400).json({ msg: 'Last name must be 2-20 characters' });
+    }
+    if (!/^[a-zA-Z\s\-']+$/.test(lastName.trim())) {
+      return res.status(400).json({ msg: 'Last name can only contain letters, spaces, hyphens, and apostrophes' });
+    }
+    
+    // Validate email
+    if (!email || email.trim().length > 30) {
+      return res.status(400).json({ msg: 'Email must not exceed 30 characters' });
+    }
+    
+    // Validate password
+    if (!password || password.length > 20) {
+      return res.status(400).json({ msg: 'Password must not exceed 20 characters' });
+    }
+    
     if (role === 'client') {
       const found = await User.findOne({ email });
       if (!found?.emailVerified) {
         return res.status(400).json({ msg: 'Please verify email first.' });
       }
-      found.firstName = firstName;
-      found.lastName  = lastName;
+      found.firstName = firstName.trim();
+      found.lastName  = lastName.trim();
       found.role      = 'client';
       found.password  = await bcrypt.hash(password, 12);
       await found.save();
@@ -223,10 +250,21 @@ router.post('/register', async (req, res) => {
     }
     // staff/admin flow
     const hash = await bcrypt.hash(password, 12);
-    await User.create({ firstName, lastName, email, password: hash, role });
+    await User.create({ 
+      firstName: firstName.trim(), 
+      lastName: lastName.trim(), 
+      email: email.trim(), 
+      password: hash, 
+      role 
+    });
     res.status(201).json({ msg: `${role} registered.` });
   } catch (err) {
     console.error(err);
+    // Return validation errors from mongoose
+    if (err.name === 'ValidationError') {
+      const firstError = Object.values(err.errors)[0];
+      return res.status(400).json({ msg: firstError.message });
+    }
     res.status(500).json({ msg: 'Server error' });
   }
 });
