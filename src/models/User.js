@@ -47,8 +47,9 @@ const userSchema = new mongoose.Schema({
   },
   password:         { 
     type: String, 
-    default: '',
-    maxlength: [20, 'Password must not exceed 20 characters']
+    default: ''
+    // Note: Password length validation is done before hashing in auth routes
+    // Don't validate here as hashed passwords are 60+ characters
   },
   role:             { type: String, enum: ['client','staff','admin'], default: 'client' },
   
