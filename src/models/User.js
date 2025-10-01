@@ -59,19 +59,41 @@ const userSchema = new mongoose.Schema({
   // Profile information
   profile: {
     avatar:         { type: String, default: '', maxlength: 500 }, // URL to profile picture
-    phone:          { type: String, default: '', maxlength: 20 },
+    phone:          { 
+      type: String, 
+      default: '', 
+      maxlength: 20,
+      validate: {
+        validator: function(v) {
+          if (!v) return true;
+          return /^[0-9]+$/.test(v); // Only numbers
+        },
+        message: 'Phone number can only contain numbers'
+      }
+    },
     address: {
-      street:       { type: String, default: '', maxlength: 200 },
-      city:         { type: String, default: '', maxlength: 100 },
-      state:        { type: String, default: '', maxlength: 100 },
-      zipCode:      { type: String, default: '', maxlength: 20 },
-      country:      { type: String, default: 'Philippines', maxlength: 100 }
+      street:       { type: String, default: '', maxlength: 100 },
+      city:         { type: String, default: '', maxlength: 50 },
+      state:        { type: String, default: '', maxlength: 50 },
+      zipCode:      { 
+        type: String, 
+        default: '', 
+        maxlength: 10,
+        validate: {
+          validator: function(v) {
+            if (!v) return true;
+            return /^[0-9]+$/.test(v); // Only numbers
+          },
+          message: 'ZIP code can only contain numbers'
+        }
+      },
+      country:      { type: String, default: 'Philippines', maxlength: 50 }
     },
     emergencyContact: {
       name:         { 
         type: String, 
         default: '', 
-        maxlength: 100,
+        maxlength: 20,
         validate: {
           validator: function(v) {
             if (!v) return true;
@@ -80,8 +102,19 @@ const userSchema = new mongoose.Schema({
           message: 'Emergency contact name can only contain letters, spaces, hyphens, and apostrophes'
         }
       },
-      phone:        { type: String, default: '', maxlength: 20 },
-      relationship: { type: String, default: '', maxlength: 50 }
+      phone:        { 
+        type: String, 
+        default: '', 
+        maxlength: 20,
+        validate: {
+          validator: function(v) {
+            if (!v) return true;
+            return /^[0-9]+$/.test(v); // Only numbers
+          },
+          message: 'Emergency contact phone can only contain numbers'
+        }
+      },
+      relationship: { type: String, default: '', maxlength: 30 }
     },
     preferences: {
       notifications: {
@@ -89,7 +122,7 @@ const userSchema = new mongoose.Schema({
         sms:        { type: Boolean, default: false }
       },
       language:     { type: String, default: 'en' },
-      timezone:     { type: String, default: 'America/New_York' }
+      timezone:     { type: String, default: 'Asia/Manila' }
     }
   },
   

@@ -79,7 +79,18 @@ router.put('/', async (req, res) => {
     res.json(updatedUser);
   } catch (err) {
     console.error('Update profile error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    console.error('Error details:', err.message);
+    
+    // Handle validation errors
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ 
+        msg: errors[0] || 'Validation error',
+        errors: errors 
+      });
+    }
+    
+    res.status(500).json({ msg: err.message || 'Server error' });
   }
 });
 
