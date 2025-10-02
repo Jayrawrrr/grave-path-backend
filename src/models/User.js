@@ -7,28 +7,28 @@ const userSchema = new mongoose.Schema({
     type: String, 
     default: '',
     trim: true,
-    minlength: [2, 'First name must be at least 2 characters'],
-    maxlength: [20, 'First name must not exceed 20 characters'],
     validate: {
       validator: function(v) {
-        if (!v) return true; // Allow empty (handled by required if needed)
+        if (!v || v.trim() === '') return true; // Allow empty
+        if (v.length < 2) return false; // Must be at least 2 characters if provided
+        if (v.length > 20) return false; // Must not exceed 20 characters
         return /^[a-zA-Z\s\-']+$/.test(v); // Only letters, spaces, hyphens, apostrophes
       },
-      message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
+      message: 'First name must be 2-20 characters and contain only letters, spaces, hyphens, and apostrophes'
     }
   },
   lastName:         { 
     type: String, 
     default: '',
     trim: true,
-    minlength: [2, 'Last name must be at least 2 characters'],
-    maxlength: [20, 'Last name must not exceed 20 characters'],
     validate: {
       validator: function(v) {
-        if (!v) return true; // Allow empty (handled by required if needed)
+        if (!v || v.trim() === '') return true; // Allow empty
+        if (v.length < 2) return false; // Must be at least 2 characters if provided
+        if (v.length > 20) return false; // Must not exceed 20 characters
         return /^[a-zA-Z\s\-']+$/.test(v); // Only letters, spaces, hyphens, apostrophes
       },
-      message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
+      message: 'Last name must be 2-20 characters and contain only letters, spaces, hyphens, and apostrophes'
     }
   },
   email:            { 

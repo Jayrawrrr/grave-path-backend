@@ -108,7 +108,7 @@ router.post('/', upload.single('proofImage'), async (req, res) => {
     if (req.user && req.user._id) {
       await ActivityLog.create({
         userId:   req.user._id,
-        userName: req.user.name  || clientName,
+        userName: req.user.firstName || clientName,
         userRole: req.user.role  || 'client',
         action:   'booking',
         details:  `Booked plot ${lotId}`
@@ -152,7 +152,7 @@ router.patch('/:id', async (req, res) => {
     if (req.user && req.user._id) {
       await ActivityLog.create({
         userId:   req.user._id,
-        userName: req.user.name  || 'Unknown User',
+        userName: req.user.firstName || 'Unknown User',
         userRole: req.user.role  || 'client',
         action:   'update',
         details:  `Updated reservation ${req.params.id}`
@@ -186,7 +186,7 @@ router.delete('/:id', async (req, res) => {
     if (req.user && req.user._id) {
       await ActivityLog.create({
         userId:   req.user._id,
-        userName: req.user.name  || 'Unknown User',
+        userName: req.user.firstName || 'Unknown User',
         userRole: req.user.role  || 'client',
         action:   'delete',
         details:  `Deleted reservation ${req.params.id}`

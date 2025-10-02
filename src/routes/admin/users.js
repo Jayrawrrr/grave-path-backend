@@ -27,9 +27,9 @@ router.get('/', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ msg: 'Name, email & password are required' });
+    const { firstName, lastName, email, password, role } = req.body;
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({ msg: 'First name, last name, email & password are required' });
     }
     if (await User.findOne({ email })) {
       return res.status(400).json({ msg: 'Email already in use' });
@@ -39,7 +39,8 @@ router.post('/', async (req, res) => {
     const hashed = await bcrypt.hash(password, 12);
 
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
       email,
       password: hashed,
       role
@@ -59,13 +60,14 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ msg: 'User not found' });
 
-    user.name  = name  ?? user.name;
+    user.firstName = firstName ?? user.firstName;
+    user.lastName = lastName ?? user.lastName;
     user.email = email ?? user.email;
-    user.role  = role  ?? user.role;
+    user.role = role ?? user.role;
 
     if (password) {
       // **HASH on update too**
@@ -75,6 +77,21 @@ router.put('/:id', async (req, res) => {
     await user.save();
     user.password = undefined;
     res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+/**
+ * GET /api/admin/users/check-email/:email
+ * Check if email already exists
+ */
+router.get('/check-email/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const existingUser = await User.findOne({ email: decodeURIComponent(email) });
+    res.json({ exists: !!existingUser });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: 'Server error' });
