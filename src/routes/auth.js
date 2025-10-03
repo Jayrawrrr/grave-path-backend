@@ -248,7 +248,16 @@ router.post('/register', async (req, res) => {
       found.lastName  = lastName.trim();
       found.role      = 'client';
       found.password  = await bcrypt.hash(password, 12);
+      
+      console.log('Client registration - saving user:', {
+        email: found.email,
+        role: found.role,
+        hasPassword: !!found.password,
+        passwordLength: found.password ? found.password.length : 0
+      });
+      
       await found.save();
+      console.log('Client registration successful for:', email);
       return res.status(201).json({ msg: 'Client registered.' });
     }
     // staff/admin flow
