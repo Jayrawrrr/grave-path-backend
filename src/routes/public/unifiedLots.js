@@ -12,13 +12,14 @@ const router = express.Router();
 // Used by the map to display graves with current status
 router.get('/', async (req, res) => {
   try {
-    const allGraves = [];
+    // Use a Map to ensure unique graves by ID
+    const gravesMap = new Map();
 
     // Get graves from old Lot model (Gardens A, B, C)
     const lotGraves = await Lot.find({ garden: { $in: ['A', 'B', 'C'] } });
     
     lotGraves.forEach(grave => {
-      allGraves.push({
+      gravesMap.set(grave.id, {
         _id: grave._id,
         id: grave.id,
         name: grave.name || '',
@@ -45,85 +46,76 @@ router.get('/', async (req, res) => {
       GardenD.find({ type: 'grave' })
     ]);
 
-    // Process Garden A graves
+    // Process Garden A graves - prioritize garden model over lot model
     gardenAGraves.forEach(grave => {
       const graveId = `A-${grave.row}-${grave.column}`;
-      // Only add if not already in lotGraves
-      if (!lotGraves.find(lot => lot.id === graveId)) {
-        allGraves.push({
-          _id: grave._id,
-          id: graveId,
-          name: grave.name || '',
-          birth: grave.birth || '',
-          death: grave.death || '',
-          status: grave.status,
-          coordinates: grave.centerCoordinates,
-          garden: 'A',
-          row: grave.row,
-          column: grave.column,
-          location: `Garden A, Row ${grave.row}, Column ${grave.column}`,
-          price: grave.price,
-          sqm: grave.sqm,
-          type: 'grave',
-          source: 'garden_a_model'
-        });
-      }
+      gravesMap.set(graveId, {
+        _id: grave._id,
+        id: graveId,
+        name: grave.name || '',
+        birth: grave.birth || '',
+        death: grave.death || '',
+        status: grave.status,
+        coordinates: grave.centerCoordinates,
+        garden: 'A',
+        row: grave.row,
+        column: grave.column,
+        location: `Garden A, Row ${grave.row}, Column ${grave.column}`,
+        price: grave.price,
+        sqm: grave.sqm,
+        type: 'grave',
+        source: 'garden_a_model'
+      });
     });
 
-    // Process Garden B graves
+    // Process Garden B graves - prioritize garden model over lot model
     gardenBGraves.forEach(grave => {
       const graveId = `B-${grave.row}-${grave.column}`;
-      // Only add if not already in lotGraves
-      if (!lotGraves.find(lot => lot.id === graveId)) {
-        allGraves.push({
-          _id: grave._id,
-          id: graveId,
-          name: grave.name || '',
-          birth: grave.birth || '',
-          death: grave.death || '',
-          status: grave.status,
-          coordinates: grave.centerCoordinates,
-          garden: 'B',
-          row: grave.row,
-          column: grave.column,
-          location: `Garden B, Row ${grave.row}, Column ${grave.column}`,
-          price: grave.price,
-          sqm: grave.sqm,
-          type: 'grave',
-          source: 'garden_b_model'
-        });
-      }
+      gravesMap.set(graveId, {
+        _id: grave._id,
+        id: graveId,
+        name: grave.name || '',
+        birth: grave.birth || '',
+        death: grave.death || '',
+        status: grave.status,
+        coordinates: grave.centerCoordinates,
+        garden: 'B',
+        row: grave.row,
+        column: grave.column,
+        location: `Garden B, Row ${grave.row}, Column ${grave.column}`,
+        price: grave.price,
+        sqm: grave.sqm,
+        type: 'grave',
+        source: 'garden_b_model'
+      });
     });
 
-    // Process Garden C graves
+    // Process Garden C graves - prioritize garden model over lot model
     gardenCGraves.forEach(grave => {
       const graveId = `C-${grave.row}-${grave.column}`;
-      // Only add if not already in lotGraves
-      if (!lotGraves.find(lot => lot.id === graveId)) {
-        allGraves.push({
-          _id: grave._id,
-          id: graveId,
-          name: grave.name || '',
-          birth: grave.birth || '',
-          death: grave.death || '',
-          status: grave.status,
-          coordinates: grave.centerCoordinates,
-          garden: 'C',
-          row: grave.row,
-          column: grave.column,
-          location: `Garden C, Row ${grave.row}, Column ${grave.column}`,
-          price: grave.price,
-          sqm: grave.sqm,
-          type: 'grave',
-          source: 'garden_c_model'
-        });
-      }
+      gravesMap.set(graveId, {
+        _id: grave._id,
+        id: graveId,
+        name: grave.name || '',
+        birth: grave.birth || '',
+        death: grave.death || '',
+        status: grave.status,
+        coordinates: grave.centerCoordinates,
+        garden: 'C',
+        row: grave.row,
+        column: grave.column,
+        location: `Garden C, Row ${grave.row}, Column ${grave.column}`,
+        price: grave.price,
+        sqm: grave.sqm,
+        type: 'grave',
+        source: 'garden_c_model'
+      });
     });
 
-    // Process Garden D graves
+    // Process Garden D graves (only in garden model)
     gardenDGraves.forEach(grave => {
       const graveId = `D-${grave.row}-${grave.column}`;
-      allGraves.push({
+      gravesMap.set(graveId, {
         _id: grave._id,
         id: graveId,
         name: grave.name || '',
@@ -141,6 +133,9 @@ router.get('/', async (req, res) => {
         source: 'garden_d_model'
       });
     });
+
+    // Convert Map to array
+    const allGraves = Array.from(gravesMap.values());
 
     // Update grave status based on active grave reservations
     const activeReservations = await GraveReservation.find({ 
@@ -164,7 +159,7 @@ router.get('/', async (req, res) => {
       }
     });
 
-    console.log(`Unified lots: ${lotGraves.length} from Lot model + ${gardenAGraves.length + gardenBGraves.length + gardenCGraves.length + gardenDGraves.length} from Garden models = ${allGraves.length} total graves`);
+    console.log(`Unified lots: ${lotGraves.length} from Lot model + ${gardenAGraves.length + gardenBGraves.length + gardenCGraves.length + gardenDGraves.length} from Garden models = ${allGraves.length} unique graves`);
     console.log(`Active grave reservations affecting status: ${activeReservations.length}`);
 
     res.json(allGraves);
