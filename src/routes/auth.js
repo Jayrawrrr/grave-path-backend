@@ -276,18 +276,39 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Login attempt for email:', email);
+    
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    console.log('User found:', !!user, user ? `Role: ${user.role}, EmailVerified: ${user.emailVerified}` : 'No user');
+    
+    if (!user) {
+      console.log('No user found with email:', email);
       return res.status(401).json({ msg: 'Invalid credentials' });
     }
+    
+    if (!user.password) {
+      console.log('User has no password set:', email);
+      return res.status(401).json({ msg: 'Invalid credentials' });
+    }
+    
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', passwordMatch);
+    
+    if (!passwordMatch) {
+      console.log('Password does not match for:', email);
+      return res.status(401).json({ msg: 'Invalid credentials' });
+    }
+    
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
+    
+    console.log('Login successful for:', email, 'Role:', user.role);
     res.json({ token, role: user.role });
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
