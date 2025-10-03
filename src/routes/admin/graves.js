@@ -1,6 +1,10 @@
 // backend/src/routes/admin/graves.js
 import express from 'express';
 import Lot from '../../models/Lot.js';
+import GardenA from '../../models/GardenA.js';
+import GardenB from '../../models/GardenB.js';
+import GardenC from '../../models/GardenC.js';
+import GardenD from '../../models/GardenD.js';
 import { protect } from '../../middleware/auth.js';
 
 const router = express.Router();
@@ -168,9 +172,42 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { name, birth, death, status, family, maintenance } = req.body;
+    const graveId = req.params.id;
     
-    const grave = await Lot.findOneAndUpdate(
-      { id: req.params.id },
+    // Parse the grave ID to determine garden and coordinates
+    // Format: "A-1-1" or "B-2-3" etc.
+    const [garden, row, column] = graveId.split('-');
+    
+    if (!garden || !row || !column) {
+      return res.status(400).json({ msg: 'Invalid grave ID format' });
+    }
+    
+    // Determine which Garden model to use
+    let GardenModel;
+    switch (garden.toUpperCase()) {
+      case 'A':
+        GardenModel = GardenA;
+        break;
+      case 'B':
+        GardenModel = GardenB;
+        break;
+      case 'C':
+        GardenModel = GardenC;
+        break;
+      case 'D':
+        GardenModel = GardenD;
+        break;
+      default:
+        return res.status(400).json({ msg: 'Invalid garden' });
+    }
+    
+    // Find and update the grave
+    const grave = await GardenModel.findOneAndUpdate(
+      { 
+        row: parseInt(row), 
+        column: parseInt(column),
+        type: 'grave'
+      },
       { 
         name, 
         birth, 
@@ -187,7 +224,26 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ msg: 'Grave not found' });
     }
     
-    res.json(grave);
+    // Return the grave in the same format as unifiedLots
+    const responseGrave = {
+      _id: grave._id,
+      id: graveId,
+      name: grave.name || '',
+      birth: grave.birth || '',
+      death: grave.death || '',
+      status: grave.status || 'available',
+      coordinates: grave.centerCoordinates,
+      garden: garden.toUpperCase(),
+      row: grave.row,
+      column: grave.column,
+      location: `Garden ${garden.toUpperCase()}, Row ${grave.row}, Column ${grave.column}`,
+      price: grave.price,
+      sqm: grave.sqm,
+      type: 'grave',
+      source: `garden_${garden.toLowerCase()}_model`
+    };
+    
+    res.json(responseGrave);
   } catch (err) {
     console.error('Error updating grave:', err);
     res.status(500).json({ msg: 'Server error' });
