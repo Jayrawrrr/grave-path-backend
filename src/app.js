@@ -48,6 +48,7 @@ import publicGardenD from './routes/public/gardenD.js';
 import adminGraveReservations from './routes/admin/graveReservations.js';
 import clientGraveReservations from './routes/client/graveReservations.js';
 import unifiedLots from './routes/public/unifiedLots.js';
+import publicGardenConfig from './routes/public/garden-config.js';
 
 dotenv.config();
 const app = express();
@@ -182,6 +183,7 @@ app.use('/api/public/garden-a', publicGardenA);
 app.use('/api/public/garden-b', publicGardenB);
 app.use('/api/public/garden-c', publicGardenC);
 app.use('/api/public/garden-d', publicGardenD);
+app.use('/api/public/garden-config', publicGardenConfig);
 
 // Connect to MongoDB & start server
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI)
