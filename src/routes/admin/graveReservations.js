@@ -201,7 +201,7 @@ router.post('/', protect(['admin', 'staff']), upload.single('proofImage'), async
       totalPrice: grave.price || 8000,
       specialRequirements,
       staffNotes,
-      proofImage: req.file ? req.file.path.replace(/\\/g, '/') : null
+      proofImage: req.file ? req.file.path.replace(/\\/g, '/').replace('uploads/', '') : null
     });
 
     await reservation.save();

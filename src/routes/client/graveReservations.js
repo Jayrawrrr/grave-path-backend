@@ -149,7 +149,7 @@ router.post('/', protect(['client']), upload.single('proofImage'), async (req, r
       paymentAmount: paymentAmountNum,
       totalPrice: gravePrice,
       specialRequirements,
-      proofImage: req.file.path.replace(/\\/g, '/'),
+      proofImage: req.file.path.replace(/\\/g, '/').replace('uploads/', ''),
       status: 'pending' // Client reservations need approval
     });
 
