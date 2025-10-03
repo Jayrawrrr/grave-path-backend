@@ -174,11 +174,17 @@ router.put('/:id', async (req, res) => {
     const { name, birth, death, status, family, maintenance } = req.body;
     const graveId = req.params.id;
     
+    console.log('Received grave ID:', graveId);
+    console.log('Grave ID type:', typeof graveId);
+    
     // Parse the grave ID to determine garden and coordinates
     // Format: "A-1-1" or "B-2-3" etc.
     const [garden, row, column] = graveId.split('-');
     
+    console.log('Parsed parts:', { garden, row, column });
+    
     if (!garden || !row || !column) {
+      console.log('Invalid grave ID format - missing parts');
       return res.status(400).json({ msg: 'Invalid grave ID format' });
     }
     
