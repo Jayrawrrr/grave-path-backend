@@ -19,9 +19,11 @@ router.get('/', async (req, res) => {
     const lotGraves = await Lot.find({ garden: { $in: ['A', 'B', 'C'] } });
     
     lotGraves.forEach(grave => {
-      gravesMap.set(grave.id, {
+      // Use consistent ID format: Garden-Row-Column (same as garden models)
+      const graveId = `${grave.garden}-${grave.row}-${grave.column}`;
+      gravesMap.set(graveId, {
         _id: grave._id,
-        id: grave.id,
+        id: graveId, // Use consistent ID format
         name: grave.name || '',
         birth: grave.birth || '',
         death: grave.death || '',
@@ -159,7 +161,7 @@ router.get('/', async (req, res) => {
       }
     });
 
-    console.log(`Unified lots: ${lotGraves.length} from Lot model + ${gardenAGraves.length + gardenBGraves.length + gardenCGraves.length + gardenDGraves.length} from Garden models = ${allGraves.length} unique graves`);
+    console.log(`Unified lots: ${lotGraves.length} from Lot model + ${gardenAGraves.length + gardenBGraves.length + gardenCGraves.length + gardenDGraves.length} from Garden models = ${allGraves.length} unique graves (after deduplication)`);
     console.log(`Active grave reservations affecting status: ${activeReservations.length}`);
 
     res.json(allGraves);
