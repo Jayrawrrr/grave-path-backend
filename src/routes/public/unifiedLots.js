@@ -15,30 +15,9 @@ router.get('/', async (req, res) => {
     // Use a Map to ensure unique graves by ID
     const gravesMap = new Map();
 
-    // Get graves from old Lot model (Gardens A, B, C)
-    const lotGraves = await Lot.find({ garden: { $in: ['A', 'B', 'C'] } });
-    
-    lotGraves.forEach(grave => {
-      // Use consistent ID format: Garden-Row-Column (same as garden models)
-      const graveId = `${grave.garden}-${grave.row}-${grave.column}`;
-      gravesMap.set(graveId, {
-        _id: grave._id,
-        id: graveId, // Use consistent ID format
-        name: grave.name || '',
-        birth: grave.birth || '',
-        death: grave.death || '',
-        status: grave.status,
-        coordinates: grave.coordinates,
-        garden: grave.garden,
-        row: grave.row,
-        column: grave.column,
-        location: grave.location,
-        price: grave.price,
-        sqm: grave.sqm,
-        type: 'grave',
-        source: 'lot_model'
-      });
-    });
+    // Skip old Lot model - use only new Garden models to avoid double-counting
+    // The Garden models (A, B, C, D) are the current system and should be the source of truth
+    console.log('Using Garden models only (A, B, C, D) - Lot model excluded to prevent double-counting');
 
     // Get graves from new garden models (A, B, C, D)
     const [gardenAGraves, gardenBGraves, gardenCGraves, gardenDGraves] = await Promise.all([
@@ -161,7 +140,7 @@ router.get('/', async (req, res) => {
       }
     });
 
-    console.log(`Unified lots: ${lotGraves.length} from Lot model + ${gardenAGraves.length + gardenBGraves.length + gardenCGraves.length + gardenDGraves.length} from Garden models = ${allGraves.length} unique graves (after deduplication)`);
+    console.log(`Unified lots: ${gardenAGraves.length + gardenBGraves.length + gardenCGraves.length + gardenDGraves.length} graves from Garden models (A, B, C, D) = ${allGraves.length} total graves`);
     console.log(`Active grave reservations affecting status: ${activeReservations.length}`);
 
     res.json(allGraves);
