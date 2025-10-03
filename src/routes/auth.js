@@ -238,7 +238,10 @@ router.post('/register', async (req, res) => {
     
     if (role === 'client') {
       const found = await User.findOne({ email });
-      if (!found?.emailVerified) {
+      if (!found) {
+        return res.status(400).json({ msg: 'Please verify email first.' });
+      }
+      if (!found.emailVerified) {
         return res.status(400).json({ msg: 'Please verify email first.' });
       }
       found.firstName = firstName.trim();

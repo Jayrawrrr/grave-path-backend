@@ -47,6 +47,7 @@ import publicGardenC from './routes/public/gardenC.js';
 import publicGardenD from './routes/public/gardenD.js';
 import adminGraveReservations from './routes/admin/graveReservations.js';
 import clientGraveReservations from './routes/client/graveReservations.js';
+import unifiedLots from './routes/public/unifiedLots.js';
 
 dotenv.config();
 const app = express();
@@ -174,6 +175,7 @@ app.use('/api/chatbot', chatbotRouter);
 
 // Public routes (no authentication required)
 app.use('/api/public/lots', publicLots);
+app.use('/api/public/unified-lots', unifiedLots);
 app.use('/api/public/announcements', publicAnnouncements);
 app.use('/api/public-access/info', publicInfo);
 app.use('/api/public/garden-a', publicGardenA);

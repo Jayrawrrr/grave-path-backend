@@ -63,13 +63,13 @@ const userSchema = new mongoose.Schema({
     phone:          { 
       type: String, 
       default: '', 
-      maxlength: 20,
+      maxlength: 11,
       validate: {
         validator: function(v) {
-          if (!v) return true;
-          return /^[0-9]+$/.test(v); // Only numbers
+          if (!v) return true; // Allow empty phone
+          return /^[0-9]{11}$/.test(v); // Exactly 11 digits
         },
-        message: 'Phone number can only contain numbers'
+        message: 'Phone number must be exactly 11 digits (e.g., 09171234567)'
       }
     },
     address: {
@@ -106,13 +106,13 @@ const userSchema = new mongoose.Schema({
       phone:        { 
         type: String, 
         default: '', 
-        maxlength: 20,
+        maxlength: 11,
         validate: {
           validator: function(v) {
-            if (!v) return true;
-            return /^[0-9]+$/.test(v); // Only numbers
+            if (!v) return true; // Allow empty phone
+            return /^[0-9]{11}$/.test(v); // Exactly 11 digits
           },
-          message: 'Emergency contact phone can only contain numbers'
+          message: 'Emergency contact phone must be exactly 11 digits (e.g., 09171234567)'
         }
       },
       relationship: { type: String, default: '', maxlength: 30 }
