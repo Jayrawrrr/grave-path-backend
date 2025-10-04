@@ -171,20 +171,14 @@ router.post('/', async (req, res) => {
 // Update grave
 router.put('/:id', async (req, res) => {
   try {
-    const { name, birth, death, status, family, maintenance } = req.body;
+    const { id, name, sqm, price, birth, death, status, family, maintenance } = req.body;
     const graveId = req.params.id;
-    
-    console.log('Received grave ID:', graveId);
-    console.log('Grave ID type:', typeof graveId);
     
     // Parse the grave ID to determine garden and coordinates
     // Format: "A-1-1" or "B-2-3" etc.
     const [garden, row, column] = graveId.split('-');
     
-    console.log('Parsed parts:', { garden, row, column });
-    
     if (!garden || !row || !column) {
-      console.log('Invalid grave ID format - missing parts');
       return res.status(400).json({ msg: 'Invalid grave ID format' });
     }
     
@@ -215,10 +209,13 @@ router.put('/:id', async (req, res) => {
         type: 'grave'
       },
       { 
-        name, 
-        birth, 
-        death, 
-        status,
+        id: id, // Lot ID
+        name, // Name
+        sqm, // Square Meters
+        price, // Price
+        birth, // Birth
+        death, // Death
+        status, // Status
         family,
         maintenance,
         updatedAt: new Date()
@@ -233,8 +230,10 @@ router.put('/:id', async (req, res) => {
     // Return the grave in the same format as unifiedLots
     const responseGrave = {
       _id: grave._id,
-      id: graveId,
+      id: grave.id || graveId,
       name: grave.name || '',
+      sqm: grave.sqm || 2,
+      price: grave.price || 50000,
       birth: grave.birth || '',
       death: grave.death || '',
       status: grave.status || 'available',
@@ -242,9 +241,6 @@ router.put('/:id', async (req, res) => {
       garden: garden.toUpperCase(),
       row: grave.row,
       column: grave.column,
-      location: `Garden ${garden.toUpperCase()}, Row ${grave.row}, Column ${grave.column}`,
-      price: grave.price,
-      sqm: grave.sqm,
       type: 'grave',
       source: `garden_${garden.toLowerCase()}_model`
     };

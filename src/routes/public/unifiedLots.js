@@ -32,8 +32,10 @@ router.get('/', async (req, res) => {
       const graveId = `A-${grave.row}-${grave.column}`;
       gravesMap.set(graveId, {
         _id: grave._id,
-        id: graveId,
+        id: grave.id || graveId,
         name: grave.name || '',
+        sqm: grave.sqm || 2,
+        price: grave.price || 50000,
         birth: grave.birth || '',
         death: grave.death || '',
         status: grave.status || 'available',
@@ -41,9 +43,6 @@ router.get('/', async (req, res) => {
         garden: 'A',
         row: grave.row,
         column: grave.column,
-        location: `Garden A, Row ${grave.row}, Column ${grave.column}`,
-        price: grave.price,
-        sqm: grave.sqm,
         type: 'grave',
         source: 'garden_a_model'
       });
