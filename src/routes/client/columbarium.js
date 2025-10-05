@@ -4,6 +4,7 @@ import { ColumbariumSlot, ColumbariumReservation } from '../../models/Columbariu
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { google } from 'googleapis';
 
 const router = express.Router();
 
@@ -177,8 +178,132 @@ router.post('/reservations', protect(['client']), upload.single('proofImage'), a
     slot.status = 'reserved';
     await slot.save();
 
+    // Send confirmation email
+    let emailSent = false;
+    let emailError = null;
+    
+    try {
+      const oauth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        process.env.GOOGLE_REDIRECT_URI
+      );
+      oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+      const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+      const emailContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Columbarium Reservation Confirmation - Garden of Memories</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            
+            <!-- Header -->
+            <div style="background-color: #ffffff; padding: 40px 40px 20px 40px; text-align: center; border-bottom: 1px solid #e9ecef;">
+              <h1 style="color: #212529; margin: 0 0 8px 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Garden of Memories</h1>
+              <p style="color: #6c757d; margin: 0; font-size: 14px; font-weight: 400;">Memorial Park</p>
+            </div>
+
+            <!-- Main content -->
+            <div style="padding: 40px 40px 20px 40px;">
+              <h2 style="color: #212529; margin: 0 0 16px 0; font-size: 20px; font-weight: 600;">Columbarium reservation submitted</h2>
+              <p style="color: #6c757d; font-size: 16px; margin: 0 0 32px 0;">Dear <strong>${clientName}</strong>,</p>
+              
+              <p style="color: #495057; font-size: 16px; margin: 0 0 32px 0;">Your columbarium reservation has been successfully submitted and is now under review.</p>
+
+              <!-- Reservation Details -->
+              <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 24px; margin: 32px 0;">
+                <h3 style="color: #212529; margin: 0 0 20px 0; font-size: 16px; font-weight: 600;">Reservation Details</h3>
+                
+                <div style="margin-bottom: 12px;">
+                  <strong style="color: #495057; font-size: 14px;">Slot:</strong>
+                  <span style="color: #212529; font-size: 14px; margin-left: 8px;">${slotId}</span>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                  <strong style="color: #495057; font-size: 14px;">Deceased:</strong>
+                  <span style="color: #212529; font-size: 14px; margin-left: 8px;">${deceasedName}</span>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                  <strong style="color: #495057; font-size: 14px;">Duration:</strong>
+                  <span style="color: #212529; font-size: 14px; margin-left: 8px;">${duration === 99 ? 'Perpetual' : duration + ' years'}</span>
+                </div>
+                
+                <div style="margin-bottom: 0;">
+                  <strong style="color: #495057; font-size: 14px;">Amount:</strong>
+                  <span style="color: #212529; font-size: 14px; margin-left: 8px;">₱${paymentAmountNum.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div style="text-align: center; margin: 32px 0;">
+                <p style="color: #495057; font-size: 14px; margin: 0 0 12px 0; font-weight: 500;">Status</p>
+                <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 0 auto; max-width: 280px;">
+                  <span style="font-size: 16px; font-weight: 600; color: #856404;">
+                    PENDING REVIEW
+                  </span>
+                </div>
+              </div>
+
+              <!-- Instructions -->
+              <div style="background-color: #f8f9fa; border-radius: 8px; padding: 24px; margin: 32px 0; border-left: 3px solid #495057;">
+                <h3 style="color: #212529; margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">What happens next</h3>
+                <ol style="color: #495057; margin: 0; padding-left: 20px; font-size: 14px;">
+                  <li style="margin-bottom: 6px;">Our staff will review your reservation within 24 hours</li>
+                  <li style="margin-bottom: 6px;">You'll receive a confirmation call once approved</li>
+                  <li style="margin-bottom: 6px;">Complete reservation documents will be emailed to you</li>
+                  <li>Complete remaining balance within 30 days after approval</li>
+                </ol>
+              </div>
+
+              <!-- Contact notice -->
+              <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin: 24px 0;">
+                <h4 style="color: #856404; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">Need assistance?</h4>
+                <p style="color: #856404; margin: 0; font-size: 13px;">Contact us at reservations@gardenofmemories.ph or call our office for any questions.</p>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="background-color: #f8f9fa; padding: 24px 40px; text-align: center; border-top: 1px solid #e9ecef;">
+              <p style="color: #6c757d; margin: 0 0 8px 0; font-size: 13px;">© 2024 Garden of Memories Memorial Park</p>
+              <p style="color: #adb5bd; margin: 0; font-size: 12px;">Pateros, Philippines</p>
+              <div style="margin-top: 16px;">
+                <a href="mailto:${process.env.EMAIL_FROM}" style="color: #495057; text-decoration: none; font-size: 13px; font-weight: 500;">Contact Support</a>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const encodedMessage = Buffer.from(
+        `To: ${clientEmail}\r\nFrom: "Garden of Memories Memorial Park" <${process.env.EMAIL_FROM}>\r\nSubject: 🏛️ Columbarium Reservation Submitted - Garden of Memories Memorial Park\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n${emailContent}`
+      ).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+      await gmail.users.messages.send({ userId: 'me', requestBody: { raw: encodedMessage } });
+      emailSent = true;
+      
+    } catch (error) {
+      console.error('Email sending error:', error);
+      emailError = error.message;
+      emailSent = false;
+    }
+
+    // If email failed, we still keep the reservation but log the error
+    if (!emailSent) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Note: We don't revert the reservation here since the user has already submitted it
+      // The email failure shouldn't prevent the reservation from being created
+    }
+
     res.status(201).json({
       message: 'Reservation submitted successfully. It will be reviewed by our staff.',
+      emailSent: emailSent,
       reservation: {
         _id: reservation._id,
         slotId: reservation.slotId,
