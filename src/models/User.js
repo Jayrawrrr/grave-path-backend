@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema({
   // Email verification
   emailVerified:    { type: Boolean, default: false },
   verificationCode: { type: String, default: null },
+  pendingEmail:     { type: String, default: null }, // Temporary storage for new email during change
   
   // Profile information
   profile: {

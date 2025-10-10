@@ -131,6 +131,201 @@ router.put('/password', async (req, res) => {
 });
 
 /**
+ * POST /api/profile/request-email-change
+ * Request to change email - sends verification code to new email
+ */
+router.post('/request-email-change', async (req, res) => {
+  try {
+    const { newEmail } = req.body;
+    
+    if (!newEmail) {
+      return res.status(400).json({ msg: 'New email is required' });
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      return res.status(400).json({ msg: 'Invalid email format' });
+    }
+    
+    // Check if new email already exists
+    const existingUser = await User.findOne({ email: newEmail });
+    if (existingUser) {
+      return res.status(400).json({ msg: 'Email already exists' });
+    }
+    
+    // Get current user
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    
+    // Generate 6-digit verification code
+    const crypto = await import('crypto');
+    const code = crypto.default.randomBytes(3).toString('hex').toUpperCase();
+    
+    // Store the code and new email temporarily
+    user.verificationCode = code;
+    user.pendingEmail = newEmail;
+    await user.save();
+    
+    // Send verification email using Gmail API
+    const { google } = await import('googleapis');
+    const { OAuth2Client } = await import('google-auth-library');
+    
+    const oauth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    );
+    
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN
+    });
+    
+    const gmail = google.google.gmail({ version: 'v1', auth: oauth2Client });
+    
+    const emailContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Email Change Verification - Garden of Memories</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+          
+          <!-- Header -->
+          <div style="background-color: #ffffff; padding: 40px 40px 20px 40px; text-align: center; border-bottom: 1px solid #e9ecef;">
+            <h1 style="color: #212529; margin: 0 0 8px 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Garden of Memories</h1>
+            <p style="color: #6c757d; margin: 0; font-size: 14px; font-weight: 400;">Memorial Park</p>
+          </div>
+
+          <!-- Main content -->
+          <div style="padding: 40px 40px 20px 40px;">
+            <h2 style="color: #212529; margin: 0 0 16px 0; font-size: 20px; font-weight: 600;">Verify your new email address</h2>
+            <p style="color: #6c757d; font-size: 16px; margin: 0 0 32px 0;">You've requested to change your email address. Please enter the verification code below to confirm this change.</p>
+
+            <!-- Verification code -->
+            <div style="text-align: center; margin: 32px 0;">
+              <p style="color: #495057; font-size: 14px; margin: 0 0 12px 0; font-weight: 500;">Verification Code</p>
+              <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 0 auto; max-width: 280px;">
+                <span style="font-size: 28px; font-weight: 600; color: #212529; letter-spacing: 3px; font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;">
+${code}
+                </span>
+              </div>
+            </div>
+
+            <!-- Instructions -->
+            <div style="background-color: #f8f9fa; border-radius: 8px; padding: 24px; margin: 32px 0; border-left: 3px solid #495057;">
+              <h3 style="color: #212529; margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Instructions</h3>
+              <ol style="color: #495057; margin: 0; padding-left: 20px; font-size: 14px;">
+                <li style="margin-bottom: 6px;">Copy the verification code above</li>
+                <li style="margin-bottom: 6px;">Return to your profile page</li>
+                <li style="margin-bottom: 6px;">Enter the code in the verification field</li>
+                <li>Complete the email change</li>
+              </ol>
+            </div>
+
+            <!-- Security notice -->
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin: 24px 0;">
+              <h4 style="color: #856404; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">Security Notice</h4>
+              <p style="color: #856404; margin: 0; font-size: 13px;">This code expires in 10 minutes. If you didn't request this change, please secure your account immediately.</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #f8f9fa; padding: 24px 40px; text-align: center; border-top: 1px solid #e9ecef;">
+            <p style="color: #6c757d; margin: 0 0 8px 0; font-size: 13px;">© 2024 Garden of Memories Memorial Park</p>
+            <p style="color: #adb5bd; margin: 0; font-size: 12px;">Pateros, Philippines</p>
+            <div style="margin-top: 16px;">
+              <a href="mailto:${process.env.EMAIL_FROM}" style="color: #495057; text-decoration: none; font-size: 13px; font-weight: 500;">Contact Support</a>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    const encodedMessage = Buffer.from(
+      `To: ${newEmail}\r\n` +
+      `From: ${process.env.EMAIL_FROM}\r\n` +
+      `Subject: GravePath Email Change Verification\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n` +
+      emailContent
+    ).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage
+      }
+    });
+    
+    res.json({ msg: 'Verification code sent to new email' });
+  } catch (err) {
+    console.error('Request email change error:', err);
+    res.status(500).json({ msg: 'Failed to send verification code' });
+  }
+});
+
+/**
+ * POST /api/profile/verify-email-change
+ * Verify the code and update email
+ */
+router.post('/verify-email-change', async (req, res) => {
+  try {
+    const { code } = req.body;
+    
+    if (!code) {
+      return res.status(400).json({ msg: 'Verification code is required' });
+    }
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    
+    if (!user.verificationCode || !user.pendingEmail) {
+      return res.status(400).json({ msg: 'No pending email change request' });
+    }
+    
+    if (user.verificationCode !== code) {
+      return res.status(400).json({ msg: 'Invalid verification code' });
+    }
+    
+    // Check again if the new email is still available
+    const existingUser = await User.findOne({ email: user.pendingEmail });
+    if (existingUser) {
+      user.verificationCode = undefined;
+      user.pendingEmail = undefined;
+      await user.save();
+      return res.status(400).json({ msg: 'Email already taken by another user' });
+    }
+    
+    // Update email
+    user.email = user.pendingEmail;
+    user.verificationCode = undefined;
+    user.pendingEmail = undefined;
+    user.emailVerified = true;
+    await user.save();
+    
+    // Return updated user without sensitive data
+    const updatedUser = await User.findById(user._id)
+      .select('-password -verificationCode')
+      .populate('staffData.supervisor', 'firstName lastName email');
+    
+    res.json({ 
+      msg: 'Email updated successfully',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('Verify email change error:', err);
+    res.status(500).json({ msg: 'Failed to verify email change' });
+  }
+});
+
+/**
  * GET /api/profile/:id
  * Get another user's profile (admin/staff only, limited information)
  */
